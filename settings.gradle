@@ -1,0 +1,3 @@
+rootProject.name='Sump Pump Tracker'
+include ':app'
+include ':openCVLibrary3410'
