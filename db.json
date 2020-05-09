@@ -1,0 +1,12 @@
+[
+  {
+    "Light Colour": "Red"
+    "Light Position": true
+    "Time Length": 5
+  }
+  {
+    "Light Colour": "Green"
+    "Light Position": false
+    "Time Length": 8
+  }
+]
