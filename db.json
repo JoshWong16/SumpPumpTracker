@@ -2,11 +2,13 @@
   {
     "Light Colour": "Red",
     "Light Position": true,
-    "Time Length": 5
+    "Time Length": 5,
+    "id": 1
   },
   {
     "Light Colour": "Green",
     "Light Position": false,
-    "Time Length": 8
+    "Time Length": 8,
+    "id": 2
   }
 ]
