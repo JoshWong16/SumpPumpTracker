@@ -2,14 +2,25 @@ package com.example.test;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.hardware.Camera;
 import android.os.Bundle;
+import android.util.AttributeSet;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import org.opencv.android.BaseLoaderCallback;
@@ -19,25 +30,37 @@ import org.opencv.android.OpenCVLoader;
 import org.opencv.android.Utils;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
+import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.core.CvType;
 import org.opencv.imgproc.Imgproc;
 
 public class MainActivity extends AppCompatActivity implements CameraBridgeViewBase.CvCameraViewListener2{
 
-    int iLowH = 45;
+    /*int iLowH = 45;
     int iLowS = 20;
     int iLowV = 10;
 
     int iHighH = 75;
     int iHighS = 225;
-    int iHighV = 225;
+    int iHighV = 225;*/
 
     int red, green, blue;
-
     Mat imgHSV, imgThreshold;
-    Scalar scLow, scHigh;
+    //Scalar scLow, scHigh;
+    float redPerc, greenPerc, yellowPerc;
+    int windowwidth, windowheight;
+    int xRed, yRed, xGreen, yGreen, xYellow, yYellow;
+
+    //app ui objects
     JavaCameraView cameraView;
+    ImageView boxRed, boxGreen, boxYellow;
+    ViewGroup rootLayout;
+    TextView text;
+
+    RelativeLayout.LayoutParams layoutParams1, layoutParams2, layoutParams3;
+
+
 
     private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
         @Override
@@ -65,71 +88,192 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        //requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
+
 
         cameraView = (JavaCameraView)findViewById(R.id.cameraView);
         cameraView.setVisibility(SurfaceView.VISIBLE);
         cameraView.setCameraIndex(0);//0 is back 1 is front
         cameraView.setCvCameraViewListener(MainActivity.this);
 
-        Button btnRed = (Button) findViewById(R.id.btnRed);
-        Button btnGreen = (Button) findViewById(R.id.btnGreen);
-        Button btnYellow = (Button) findViewById(R.id.btnYellow);
+        rootLayout = (ViewGroup) findViewById(R.id.activity_main);
+        boxRed = (ImageView) findViewById(R.id.boxRed);
+        boxGreen = (ImageView) findViewById(R.id.boxGreen);
+        boxYellow = (ImageView) findViewById(R.id.boxYellow);
 
-        btnRed.setOnClickListener(new View.OnClickListener() {
+        text = (TextView) findViewById(R.id.colourSelec);
+
+
+        //windowwidth = getWindowManager().getDefaultDisplay().getWidth();
+        //windowheight = getWindowManager().getDefaultDisplay().getHeight();
+
+        layoutParams1 = new RelativeLayout.LayoutParams(100, 100);
+        layoutParams2 = new RelativeLayout.LayoutParams(100, 100);
+        layoutParams3 = new RelativeLayout.LayoutParams(100, 100);
+
+        layoutParams1.leftMargin = 60;
+        layoutParams1.topMargin = 0;
+        layoutParams2.leftMargin = 60;
+        layoutParams2.topMargin = 110;
+        layoutParams3.leftMargin = 60;
+        layoutParams3.topMargin = 220;
+
+        boxRed.setLayoutParams(layoutParams1);
+        boxRed.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public void onClick(View view) {
-                TextView colorSelec = (TextView) findViewById(R.id.colourSelec);
-                colorSelec.setText("Red");
-                colorSelec.setTextColor(Color.RED);
+            public boolean onTouch(View view, MotionEvent event) {
+                final int X = (int) event.getRawX();
+                final int Y = (int) event.getRawY();
+                switch (event.getAction() & MotionEvent.ACTION_MASK) {
+                    case MotionEvent.ACTION_DOWN:
+                        RelativeLayout.LayoutParams lParams = (RelativeLayout.LayoutParams) boxRed.getLayoutParams();
+                        xRed = X - lParams.leftMargin;
+                        yRed = Y - lParams.topMargin;
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        break;
+                    case MotionEvent.ACTION_POINTER_DOWN:
+                        break;
+                    case MotionEvent.ACTION_POINTER_UP:
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+                        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) boxRed.getLayoutParams();
+                        layoutParams.leftMargin = X - xRed;
+                        layoutParams.topMargin = Y - yRed;
+                        layoutParams.rightMargin = -250;
+                        layoutParams.bottomMargin = -250;
+                        boxRed.setLayoutParams(layoutParams);
 
-                iLowH = 110;
-                iLowS = 30;
-                iLowV = 10;
+                        if(layoutParams.leftMargin < 60){
+                            layoutParams.leftMargin = 60;
 
-                iHighH = 140;
-                iHighS = 200;
-                iHighV = 225;
+                        }
+                        if(layoutParams.topMargin < 0) {
+                            layoutParams.topMargin = 0;
+
+                        }
+                        if(layoutParams.topMargin > 980) {
+                            layoutParams.topMargin = 980;
+
+                        }
+                        if(layoutParams.leftMargin > 1880) {
+                            layoutParams.leftMargin = 1880;
+                        }
+                    break;
+                }
+
+                //RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) boxRed.getLayoutParams();
+
+
+                rootLayout.invalidate();
+                return true;
             }
         });
-
-        btnGreen.setOnClickListener(new View.OnClickListener() {
+        boxGreen.setLayoutParams(layoutParams2);
+        boxGreen.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public void onClick(View view) {
-                TextView colorSelec = (TextView) findViewById(R.id.colourSelec);
-                colorSelec.setText("Green");
-                colorSelec.setTextColor(Color.GREEN);
+            public boolean onTouch(View view, MotionEvent event) {
+                final int X = (int) event.getRawX();
+                final int Y = (int) event.getRawY();
+                switch (event.getAction() & MotionEvent.ACTION_MASK) {
+                    case MotionEvent.ACTION_DOWN:
+                        RelativeLayout.LayoutParams lParams = (RelativeLayout.LayoutParams) boxGreen.getLayoutParams();
+                        xGreen = X - lParams.leftMargin;
+                        yGreen = Y - lParams.topMargin;
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        break;
+                    case MotionEvent.ACTION_POINTER_DOWN:
+                        break;
+                    case MotionEvent.ACTION_POINTER_UP:
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+                        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) boxGreen.getLayoutParams();
+                        layoutParams.leftMargin = X - xGreen;
+                        layoutParams.topMargin = Y - yGreen;
+                        layoutParams.rightMargin = -250;
+                        layoutParams.bottomMargin = -250;
+                        boxGreen.setLayoutParams(layoutParams);
 
-                iLowH = 45;
-                iLowS = 10;
-                iLowV = 10;
+                        if(layoutParams.leftMargin < 60){
+                            layoutParams.leftMargin = 60;
 
-                iHighH = 75;
-                iHighS = 225;
-                iHighV = 225;
+                        }
+                        if(layoutParams.topMargin < 0) {
+                            layoutParams.topMargin = 0;
+
+                        }
+                        if(layoutParams.topMargin > 980) {
+                            layoutParams.topMargin = 980;
+
+                        }
+                        if(layoutParams.leftMargin > 1880) {
+                            layoutParams.leftMargin = 1880;
+                        }
+
+                        break;
+                }
+                rootLayout.invalidate();
+                return true;
             }
         });
-
-        btnYellow.setOnClickListener(new View.OnClickListener() {
+        boxYellow.setLayoutParams(layoutParams3);
+        boxYellow.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public void onClick(View view) {
-                TextView colorSelec = (TextView) findViewById(R.id.colourSelec);
-                colorSelec.setText("Yellow");
-                colorSelec.setTextColor(Color.YELLOW);
+            public boolean onTouch(View view, MotionEvent event) {
+                final int X = (int) event.getRawX();
+                final int Y = (int) event.getRawY();
+                switch (event.getAction() & MotionEvent.ACTION_MASK) {
+                    case MotionEvent.ACTION_DOWN:
+                        RelativeLayout.LayoutParams lParams = (RelativeLayout.LayoutParams) boxYellow.getLayoutParams();
+                        xYellow = X - lParams.leftMargin;
+                        yYellow = Y - lParams.topMargin;
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        break;
+                    case MotionEvent.ACTION_POINTER_DOWN:
+                        break;
+                    case MotionEvent.ACTION_POINTER_UP:
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+                        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) boxYellow.getLayoutParams();
+                        layoutParams.leftMargin = X - xYellow;
+                        layoutParams.topMargin = Y - yYellow;
+                        layoutParams.rightMargin = -250;
+                        layoutParams.bottomMargin = -250;
+                        boxYellow.setLayoutParams(layoutParams);
 
-                iLowH = 65;
-                iLowS = 20;
-                iLowV = 10;
+                        if(layoutParams.leftMargin < 60){
+                            layoutParams.leftMargin = 60;
 
-                iHighH = 100;
-                iHighS = 200;
-                iHighV = 225;
+                        }
+                        if(layoutParams.topMargin < 0) {
+                            layoutParams.topMargin = 0;
+
+                        }
+                        if(layoutParams.topMargin > 980) {
+                            layoutParams.topMargin = 980;
+
+                        }
+                        if(layoutParams.leftMargin > 1880) {
+                            layoutParams.leftMargin = 1880;
+                        }
+
+                        break;
+                }
+                rootLayout.invalidate();
+                return true;
             }
         });
     }
+
 
 
 
@@ -190,56 +334,101 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
-        scLow = new Scalar(iLowH, iLowS, iLowV);
-        scHigh = new Scalar(iHighH, iHighS, iHighV);
+
+        //float redPerc, greenPerc, yellowPerc;
+
+
+        //scLow = new Scalar(iLowH, iLowS, iLowV);
+        //scHigh = new Scalar(iHighH, iHighS, iHighV);
 
         Imgproc.cvtColor(inputFrame.rgba(), imgHSV, Imgproc.COLOR_BGR2HSV);//process image and convert it to hsv
-        Core.inRange(imgHSV, scLow, scHigh, imgThreshold);
 
+        Core.inRange(imgHSV, new Scalar(110, 30, 10), new Scalar(140, 200, 225), imgThreshold);
+        redPerc = getPercBW((boxRed.getLeft()-60), boxRed.getTop());
 
-        getPercBW();
+        Core.inRange(imgHSV, new Scalar(65, 20, 10), new Scalar(100, 200, 225), imgThreshold);
+        yellowPerc = getPercBW((boxYellow.getLeft()-60), boxYellow.getTop());
 
+        Core.inRange(imgHSV, new Scalar(45, 10, 10), new Scalar(75, 225, 225), imgThreshold);
+        greenPerc = getPercBW((boxGreen.getLeft()-60), boxGreen.getTop());
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                text.setText("Green: "+(int)greenPerc+",\nRed: "+(int)redPerc+",\nYellow: "+(int)yellowPerc);
+            }
+        });
+
+        Imgproc.rectangle(imgThreshold, new Point((boxRed.getLeft()-60), boxRed.getTop()), new Point((boxRed.getLeft()+38),(boxRed.getTop()+99)), new Scalar(255,0,255), 1);
+        Imgproc.rectangle(imgThreshold, new Point((boxGreen.getLeft()-60), boxGreen.getTop()), new Point((boxGreen.getLeft()+38),(boxGreen.getTop()+99)), new Scalar(255,0,255), 1);
+        Imgproc.rectangle(imgThreshold, new Point((boxYellow.getLeft()-60), boxYellow.getTop()), new Point((boxYellow.getLeft()+38),(boxYellow.getTop()+99)), new Scalar(255,0,255), 1);
+        Imgproc.rectangle(imgThreshold, new Point(0, 0), new Point(imgThreshold.width()-1,imgThreshold.height()-1), new Scalar(255,0,255), 2);//draw border
+
+        //Log.d("MainActivity:", "rx"+imgThreshold.width()+" ry"+imgThreshold.height());
+        //Log.d("MainActivity:", "gx"+xGreen+"gy"+yGreen);
+        //Log.d("MainActivity:", "yx"+xYellow+" yy"+yYellow);
         return imgThreshold;
     }
 
 
 
 
-    public void getPercBW(){
+    public float getPercBW(int xstart, int ystart){
 
-        int totWhite = 0;
-        int totBlack = 0;
-        int percBW = 0;
+        float totWhite = 0;
+        float totBlack = 0;
+        float percBW;
 
         Bitmap bmp = Bitmap.createBitmap(imgThreshold.width(), imgThreshold.height(), Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(imgThreshold, bmp,false);
 
-        for(int i = 0; i < bmp.getHeight(); i++)
+        for(int i = ystart; i <= (ystart + 99); i++)
         {
-            for(int j = 0; j < bmp.getWidth(); j++)
+            for(int j = xstart; j <= (xstart + 98); j++)
             {
                 int pixel = bmp.getPixel(j, i);
-                //bmp.recycle();
+
                 red = Color.red(pixel);
                 green = Color.green(pixel);
                 blue = Color.blue(pixel);
 
-                Log.d("MainActivity", red);
+                //Log.d("MainActivity", "red:"+red);
+                //Log.d("MainActivity", "grn:"+green);
+                //Log.d("MainActivity", "bl:"+blue);
 
-                if(red == 255 && green == 255 && blue == 255){
-                    totWhite++;
-                }else {
+                if(red == 0 && green == 0 && blue == 0){
                     totBlack++;
+                }else {
+                    totWhite++;
                 }
             }
         }
 
+        //Log.d("MainActivity", "bl:"+totBlack);
+        //Log.d("MainActivity", "wh:"+totWhite);
+
         percBW = (totWhite/(totBlack+totWhite))*100;//total percentage of black and white
 
-        if (percBW > 50){
+        /*if (percBW > 20){
             Log.d("MainActivity", " UH oh LIGHTS ARE ON");
-        }
+        }*/
 
+        return percBW;
     }
 }
 
+
+
+
+class CustomizableCameraView extends JavaCameraView {
+
+    public CustomizableCameraView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+    }
+
+    public void setPreviewFPS(double min, double max){
+        Camera.Parameters params = mCamera.getParameters();
+        params.setPreviewFpsRange((int)(min*100), (int)(max*100));
+        mCamera.setParameters(params);
+    }
+}
