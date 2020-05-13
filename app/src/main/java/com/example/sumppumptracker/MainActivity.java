@@ -37,13 +37,34 @@ import org.opencv.imgproc.Imgproc;
 
 public class MainActivity extends AppCompatActivity implements CameraBridgeViewBase.CvCameraViewListener2{
 
-    /*int iLowH = 45;
-    int iLowS = 20;
-    int iLowV = 10;
+    int greenLowH = 45;
+    int greenLowS = 20;
+    int greenLowV = 10;
+    int greenHighH = 75;
+    int greenHighS = 225;
+    int greenHighV = 225;
 
-    int iHighH = 75;
-    int iHighS = 225;
-    int iHighV = 225;*/
+    int redLowH = 110;
+    int redLowS = 20;
+    int redLowV = 10;
+    int redHighH = 140;
+    int redHighS = 200;
+    int redHighV = 225;
+
+    int yellowLowH = 65;
+    int yellowLowS = 20;
+    int yellowLowV = 10;
+    int yellowHighH = 100;
+    int yellowHighS = 225;
+    int yellowHighV = 225;
+
+    int LowH = 110;
+    int LowS = 20;
+    int LowV = 10;
+    int HighH = 140;
+    int HighS = 225;
+    int HighV = 225;
+
 
     int red, green, blue;
     Mat imgHSV, imgThreshold;
@@ -51,12 +72,19 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     float redPerc, greenPerc, yellowPerc;
     int windowwidth, windowheight;
     int xRed, yRed, xGreen, yGreen, xYellow, yYellow;
+    int xdimension = 1920;
+    int ydimension = 1080;
+    boolean hsvCamera = false;
 
     //app ui objects
     JavaCameraView cameraView;
     ImageView boxRed, boxGreen, boxYellow;
     ViewGroup rootLayout;
     TextView text;
+    Button btnRed;
+    Button btnGreen;
+    Button btnYellow;
+    Button btnHSV;
 
     RelativeLayout.LayoutParams layoutParams1, layoutParams2, layoutParams3;
 
@@ -110,6 +138,56 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
         text = (TextView) findViewById(R.id.colourSelec);
 
+        btnRed = (Button) findViewById(R.id.btnRed);
+        btnGreen = (Button) findViewById(R.id.btnGreen);
+        btnYellow = (Button) findViewById(R.id.btnYellow);
+        btnHSV = (Button) findViewById(R.id.btnHSV);
+
+        btnRed.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                hsvCamera = false;
+                LowH = redLowH;
+                LowS = redLowS;
+                LowV = redLowV;
+                HighH = redHighH;
+                HighS = redHighS;
+                HighV = redHighV;
+            }
+        });
+
+        btnGreen.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                hsvCamera = false;
+                LowH = greenLowH;
+                LowS = greenLowS;
+                LowV = greenLowV;
+                HighH = greenHighH;
+                HighS = greenHighS;
+                HighV = greenHighV;
+            }
+        });
+
+        btnYellow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                hsvCamera = false;
+                LowH = yellowLowH;
+                LowS = yellowLowS;
+                LowV = yellowLowV;
+                HighH = yellowHighH;
+                HighS = yellowHighS;
+                HighV = yellowHighV;
+            }
+        });
+
+        btnHSV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                hsvCamera = true;
+            }
+        });
 
         //windowwidth = getWindowManager().getDefaultDisplay().getWidth();
         //windowheight = getWindowManager().getDefaultDisplay().getHeight();
@@ -159,12 +237,12 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                             layoutParams.topMargin = 0;
 
                         }
-                        if(layoutParams.topMargin > 980) {
-                            layoutParams.topMargin = 980;
+                        if(layoutParams.topMargin > (ydimension - 100)) {
+                            layoutParams.topMargin = (ydimension - 100);
 
                         }
-                        if(layoutParams.leftMargin > 1880) {
-                            layoutParams.leftMargin = 1880;
+                        if(layoutParams.leftMargin > (xdimension - 40)) {
+                            layoutParams.leftMargin = (xdimension - 40);
                         }
                     break;
                 }
@@ -210,12 +288,12 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                             layoutParams.topMargin = 0;
 
                         }
-                        if(layoutParams.topMargin > 980) {
-                            layoutParams.topMargin = 980;
+                        if(layoutParams.topMargin > (ydimension - 100)) {
+                            layoutParams.topMargin = (ydimension - 100);
 
                         }
-                        if(layoutParams.leftMargin > 1880) {
-                            layoutParams.leftMargin = 1880;
+                        if(layoutParams.leftMargin > (xdimension - 40)) {
+                            layoutParams.leftMargin = (xdimension - 40);
                         }
 
                         break;
@@ -258,12 +336,12 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                             layoutParams.topMargin = 0;
 
                         }
-                        if(layoutParams.topMargin > 980) {
-                            layoutParams.topMargin = 980;
+                        if(layoutParams.topMargin > (ydimension - 100)) {
+                            layoutParams.topMargin = (ydimension - 100);
 
                         }
-                        if(layoutParams.leftMargin > 1880) {
-                            layoutParams.leftMargin = 1880;
+                        if(layoutParams.leftMargin > (xdimension - 40)) {
+                            layoutParams.leftMargin = (xdimension - 40);
                         }
 
                         break;
@@ -343,31 +421,43 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
         Imgproc.cvtColor(inputFrame.rgba(), imgHSV, Imgproc.COLOR_BGR2HSV);//process image and convert it to hsv
 
-        Core.inRange(imgHSV, new Scalar(110, 30, 10), new Scalar(140, 200, 225), imgThreshold);
+        Core.inRange(imgHSV, new Scalar(redLowH, redLowS, redLowV), new Scalar(redHighH, redHighS, redHighV), imgThreshold);
         redPerc = getPercBW((boxRed.getLeft()-60), boxRed.getTop());
 
-        Core.inRange(imgHSV, new Scalar(65, 20, 10), new Scalar(100, 200, 225), imgThreshold);
+        Core.inRange(imgHSV, new Scalar(yellowLowH, yellowLowS, yellowLowV), new Scalar(yellowHighH, yellowHighS, yellowHighV), imgThreshold);
         yellowPerc = getPercBW((boxYellow.getLeft()-60), boxYellow.getTop());
 
-        Core.inRange(imgHSV, new Scalar(45, 10, 10), new Scalar(75, 225, 225), imgThreshold);
+        Core.inRange(imgHSV, new Scalar(greenLowH, greenLowS, greenLowV), new Scalar(greenHighH, greenHighS, greenHighV), imgThreshold);
         greenPerc = getPercBW((boxGreen.getLeft()-60), boxGreen.getTop());
 
         runOnUiThread(new Runnable() {
+            @SuppressLint("SetTextI18n")
             @Override
             public void run() {
                 text.setText("Green: "+(int)greenPerc+",\nRed: "+(int)redPerc+",\nYellow: "+(int)yellowPerc);
             }
         });
 
-        Imgproc.rectangle(imgThreshold, new Point((boxRed.getLeft()-60), boxRed.getTop()), new Point((boxRed.getLeft()+38),(boxRed.getTop()+99)), new Scalar(255,0,255), 1);
-        Imgproc.rectangle(imgThreshold, new Point((boxGreen.getLeft()-60), boxGreen.getTop()), new Point((boxGreen.getLeft()+38),(boxGreen.getTop()+99)), new Scalar(255,0,255), 1);
-        Imgproc.rectangle(imgThreshold, new Point((boxYellow.getLeft()-60), boxYellow.getTop()), new Point((boxYellow.getLeft()+38),(boxYellow.getTop()+99)), new Scalar(255,0,255), 1);
-        Imgproc.rectangle(imgThreshold, new Point(0, 0), new Point(imgThreshold.width()-1,imgThreshold.height()-1), new Scalar(255,0,255), 2);//draw border
+        if(!hsvCamera) {
+            Core.inRange(imgHSV, new Scalar(LowH, LowS, LowV), new Scalar(HighH, HighS, HighV), imgThreshold);
+            Imgproc.rectangle(imgThreshold, new Point((boxRed.getLeft() - 60), boxRed.getTop()), new Point((boxRed.getLeft() + 38), (boxRed.getTop() + 99)), new Scalar(255, 0, 255), 1);
+            Imgproc.rectangle(imgThreshold, new Point((boxGreen.getLeft() - 60), boxGreen.getTop()), new Point((boxGreen.getLeft() + 38), (boxGreen.getTop() + 99)), new Scalar(255, 0, 255), 1);
+            Imgproc.rectangle(imgThreshold, new Point((boxYellow.getLeft() - 60), boxYellow.getTop()), new Point((boxYellow.getLeft() + 38), (boxYellow.getTop() + 99)), new Scalar(255, 0, 255), 1);
+            Imgproc.rectangle(imgThreshold, new Point(0, 0), new Point(imgThreshold.width() - 1, imgThreshold.height() - 1), new Scalar(255, 0, 255), 2);//draw border
 
+            return imgThreshold;
+        }else{
+            Imgproc.rectangle(imgHSV, new Point((boxRed.getLeft() - 60), boxRed.getTop()), new Point((boxRed.getLeft() + 38), (boxRed.getTop() + 99)), new Scalar(255, 0, 255), 1);
+            Imgproc.rectangle(imgHSV, new Point((boxGreen.getLeft() - 60), boxGreen.getTop()), new Point((boxGreen.getLeft() + 38), (boxGreen.getTop() + 99)), new Scalar(255, 0, 255), 1);
+            Imgproc.rectangle(imgHSV, new Point((boxYellow.getLeft() - 60), boxYellow.getTop()), new Point((boxYellow.getLeft() + 38), (boxYellow.getTop() + 99)), new Scalar(255, 0, 255), 1);
+            Imgproc.rectangle(imgHSV, new Point(0, 0), new Point(imgThreshold.width() - 1, imgThreshold.height() - 1), new Scalar(255, 0, 255), 2);//draw border
+
+            return imgHSV;
+        }
         //Log.d("MainActivity:", "rx"+imgThreshold.width()+" ry"+imgThreshold.height());
         //Log.d("MainActivity:", "gx"+xGreen+"gy"+yGreen);
         //Log.d("MainActivity:", "yx"+xYellow+" yy"+yYellow);
-        return imgThreshold;
+
     }
 
 
@@ -420,7 +510,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
 
 
-class CustomizableCameraView extends JavaCameraView {
+/*class CustomizableCameraView extends JavaCameraView {
 
     public CustomizableCameraView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -431,4 +521,4 @@ class CustomizableCameraView extends JavaCameraView {
         params.setPreviewFpsRange((int)(min*100), (int)(max*100));
         mCamera.setParameters(params);
     }
-}
+}*/

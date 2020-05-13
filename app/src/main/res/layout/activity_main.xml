@@ -57,4 +57,48 @@
         android:alpha="0.5"
         app:srcCompat="@android:color/holo_orange_light" />
 
+    <Button
+        android:id="@+id/btnRed"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="20dp"
+        android:layout_marginLeft="100dp"
+        android:background="#F44336"
+        android:rotation="-90"
+        android:text="Red" />
+
+    <Button
+        android:id="@+id/btnGreen"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="20dp"
+        android:layout_marginLeft="150dp"
+        android:background="#8BC34A"
+        android:rotation="-90"
+        android:text="Green" />
+
+    <Button
+        android:id="@+id/btnYellow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="20dp"
+        android:layout_marginLeft="200dp"
+        android:background="#FFEB3B"
+        android:rotation="-90"
+        android:text="Yellow" />
+
+    <Button
+        android:id="@+id/btnHSV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="20dp"
+        android:layout_marginLeft="250dp"
+        android:background="#2196F3"
+        android:rotation="-90"
+        android:text="HSV" />
+
 </RelativeLayout>
