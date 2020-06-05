@@ -1,0 +1,85 @@
+{
+	"providers": {
+		"awscloudformation": {
+			"AuthRoleName": "amplify-sumppumptracker-dev-204411-authRole",
+			"UnauthRoleArn": "arn:aws:iam::083557640842:role/amplify-sumppumptracker-dev-204411-unauthRole",
+			"AuthRoleArn": "arn:aws:iam::083557640842:role/amplify-sumppumptracker-dev-204411-authRole",
+			"Region": "us-west-2",
+			"DeploymentBucketName": "amplify-sumppumptracker-dev-204411-deployment",
+			"UnauthRoleName": "amplify-sumppumptracker-dev-204411-unauthRole",
+			"StackName": "amplify-sumppumptracker-dev-204411",
+			"StackId": "arn:aws:cloudformation:us-west-2:083557640842:stack/amplify-sumppumptracker-dev-204411/016a2340-9983-11ea-87b1-024b5c27738c",
+			"AmplifyAppId": "d2778adp376hm6"
+		}
+	},
+	"function": {
+		"LambdaFunc": {
+			"build": true,
+			"providerPlugin": "awscloudformation",
+			"service": "Lambda",
+			"lastBuildTimeStamp": "2020-05-20T21:22:15.459Z",
+			"lastPackageTimeStamp": "2020-05-20T21:22:16.530Z",
+			"distZipFilename": "LambdaFunc-38746d716b6967357476-build.zip",
+			"providerMetadata": {
+				"s3TemplateURL": "https://s3.amazonaws.com/amplify-sumppumptracker-dev-204411-deployment/amplify-cfn-templates/function/LambdaFunc-cloudformation-template.json",
+				"logicalId": "functionLambdaFunc"
+			},
+			"lastPushTimeStamp": "2020-05-20T21:25:19.620Z",
+			"output": {
+				"Region": "us-west-2",
+				"Arn": "arn:aws:lambda:us-west-2:083557640842:function:LambdaFunc-dev",
+				"Name": "LambdaFunc-dev",
+				"LambdaExecutionRole": "sumppumptrackerLambdaRoled1eb2885-dev"
+			},
+			"lastPushDirHash": "K32RHjruTWGHtywI7W2ATYSC5wM="
+		}
+	},
+	"auth": {
+		"cognitobb2e2bfe": {
+			"service": "Cognito",
+			"providerPlugin": "awscloudformation",
+			"providerMetadata": {
+				"s3TemplateURL": "https://s3.amazonaws.com/amplify-sumppumptracker-dev-204411-deployment/amplify-cfn-templates/auth/cognitobb2e2bfe-cloudformation-template.yml",
+				"logicalId": "authcognitobb2e2bfe"
+			},
+			"lastPushTimeStamp": "2020-05-20T21:25:19.620Z",
+			"output": {
+				"AppClientSecret": "qbsj3qm7v5vqff4tfoj3rh4rhqlji88tav2e7vg7jqcejeg91vt",
+				"UserPoolId": "us-west-2_OvqfNhhEW",
+				"AppClientIDWeb": "44r4oq6fku0tebmnefrpgl8718",
+				"AppClientID": "42gilpe32qnjt5cd8ci98frc65",
+				"IdentityPoolId": "us-west-2:88c092e6-3da6-46d2-bd35-ddaccd203b14",
+				"IdentityPoolName": "sumppumptracker_identitypool_6f87b93f__dev",
+				"UserPoolName": "sumppumptracker_userpool_6f87b93f"
+			},
+			"lastPushDirHash": "ACxuXu0/G6wXQIgx5m3dJrjIVrU="
+		}
+	},
+	"api": {
+		"AmplifyRestApi": {
+			"service": "API Gateway",
+			"providerPlugin": "awscloudformation",
+			"dependsOn": [
+				{
+					"category": "function",
+					"resourceName": "LambdaFunc",
+					"attributes": [
+						"Name",
+						"Arn"
+					]
+				}
+			],
+			"providerMetadata": {
+				"s3TemplateURL": "https://s3.amazonaws.com/amplify-sumppumptracker-dev-204411-deployment/amplify-cfn-templates/api/AmplifyRestApi-cloudformation-template.json",
+				"logicalId": "apiAmplifyRestApi"
+			},
+			"lastPushTimeStamp": "2020-05-20T21:25:19.620Z",
+			"output": {
+				"ApiName": "AmplifyRestApi",
+				"RootUrl": "https://ct42g13b7d.execute-api.us-west-2.amazonaws.com/dev",
+				"ApiId": "ct42g13b7d"
+			},
+			"lastPushDirHash": "FKYFpm1DyICaztKGYQWEelPF+hs="
+		}
+	}
+}

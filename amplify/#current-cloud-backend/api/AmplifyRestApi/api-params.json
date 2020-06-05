@@ -1,0 +1,47 @@
+{
+    "paths": [
+        {
+            "name": "/items",
+            "lambdaFunction": "LambdaFunc",
+            "privacy": {
+                "protected": true,
+                "auth": [
+                    "/POST",
+                    "/GET",
+                    "/PUT",
+                    "/PATCH",
+                    "/DELETE"
+                ],
+                "unauth": [
+                    "/GET",
+                    "/PUT",
+                    "/PATCH",
+                    "/DELETE"
+                ]
+            }
+        }
+    ],
+    "resourceName": "AmplifyRestApi",
+    "apiName": "AmplifyRestApi",
+    "functionArns": [
+        {
+            "lambdaFunction": "LambdaFunc"
+        }
+    ],
+    "privacy": {
+        "auth": 1,
+        "unauth": 1,
+        "authRoleName": "amplify-sumppumptracker-dev-204411-authRole",
+        "unAuthRoleName": "amplify-sumppumptracker-dev-204411-unauthRole"
+    },
+    "dependsOn": [
+        {
+            "category": "function",
+            "resourceName": "LambdaFunc",
+            "attributes": [
+                "Name",
+                "Arn"
+            ]
+        }
+    ]
+}
