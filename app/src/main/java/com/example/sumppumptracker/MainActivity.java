@@ -2,9 +2,14 @@ package com.example.sumppumptracker;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.SurfaceView;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.opencv.android.BaseLoaderCallback;
@@ -18,10 +23,15 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
     CameraBridgeViewBase cameraBridgeViewBase;
     BaseLoaderCallback baseLoaderCallback;
-    Mat mat1, mat2, mat3;
-    int counter = 0;
 
-    //methods act as triggers that the app looks for
+
+
+    //item in DynamoDB to update (hardcoded)
+    private String lightStatus = "1";
+    private String TAG = "DynamoDB";
+    private TextView textViewItem;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,7 +57,79 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                 }
             }
         };
+
+        textViewItem = findViewById(R.id.textViewItem);
+        textViewItem.setText("Press a button...");
+        textViewItem.setBackgroundColor(Color.GREEN);
+
+        //Button to update lightID: 1
+        Button buttonUpdate1 = findViewById(R.id.button1);
+        buttonUpdate1.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                Log.i(TAG, "Updating lightID: 1");
+                //create a new AsyncTask and update textView
+                UpdateAsyncTask updateAsyncTask = new UpdateAsyncTask();
+                textViewItem.setText("Updating lightID: 1");
+                textViewItem.setBackgroundColor(Color.YELLOW);
+                //execute AsyncTask and passing it the primary key
+                updateAsyncTask.execute("1");
+            }
+        });
+
     }
+
+    /**
+     * Async Task to update lightstatus
+     */
+
+    private class UpdateAsyncTask extends AsyncTask<String, Void, Boolean> {
+
+        @Override
+        protected Boolean doInBackground(String... strings) {
+            boolean isSuccess = false;
+
+            Log.i(TAG, "in UpdateAsyncTask doInBackground updating LightID: 1");
+            //create instance of DatabaseAccess
+            DatabaseAccess databaseAccess = DatabaseAccess.getInstance(MainActivity.this);
+
+            try {
+                //call updateLightStatus method
+                isSuccess = databaseAccess.updateLightStatus("1");
+            }catch (Exception e){
+                Log.i(TAG, "error updating contact: " + e.getMessage());
+            }
+
+            return isSuccess;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean isSuccess) {
+            super.onPostExecute(isSuccess);
+            Log.i(TAG, "in UpdateAsyncTask onPostExecute os success: " + isSuccess);
+
+            if(isSuccess){
+                textViewItem.setText("Light status updated");
+                textViewItem.setBackgroundColor(Color.GREEN);
+            } else{
+                textViewItem.setText("Light status not updated");
+                textViewItem.setBackgroundColor(Color.YELLOW);
+            }
+
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
 
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame){
