@@ -8,6 +8,7 @@ import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.hardware.Camera;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -22,6 +23,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import com.example.sumppumptracker.DatabaseAccess;
 
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
@@ -385,4 +388,52 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
         return percBW;
     }
+
+    Button buttonUpdate1 = findViewById(R.id.button1);
+        buttonUpdate1.setOnClickListener(new View.OnClickListener(){
+        @Override
+        public void onClick(View v) {
+            Log.i(TAG, "Updating lightID: 1");
+            //create a new AsyncTask
+            UpdateAsyncTask updateAsyncTask = new UpdateAsyncTask();
+            //execute AsyncTask and passing it the primary key
+            updateAsyncTask.execute("1");
+        }
+    });
+
 }
+
+/**
+ * Async Task to update lightstatus
+ */
+
+private class UpdateAsyncTask extends AsyncTask<String, Void, Boolean> {
+
+    @Override
+    protected Boolean doInBackground(String... strings) {
+        boolean isSuccess = false;
+
+        Log.i(TAG, "in UpdateAsyncTask doInBackground updating LightID: 1");
+        //create instance of DatabaseAccess
+        DatabaseAccess databaseAccess = DatabaseAccess.getInstance(MainActivity.this);
+
+        try {
+            //call updateLightStatus method
+            isSuccess = databaseAccess.updateLightStatus("1");
+        }catch (Exception e){
+            Log.i(TAG, "error updating contact: " + e.getMessage());
+        }
+
+        return isSuccess;
+    }
+
+    @Override
+    protected void onPostExecute(Boolean isSuccess) {
+        super.onPostExecute(isSuccess);
+        Log.i(TAG, "in UpdateAsyncTask onPostExecute os success: " + isSuccess);
+
+    }
+}
+
+}
+
