@@ -58,9 +58,6 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             }
         };
 
-        textViewItem = findViewById(R.id.textViewItem);
-        textViewItem.setText("Press a button...");
-        textViewItem.setBackgroundColor(Color.GREEN);
 
         //Button to update lightID: 1
         Button buttonUpdate1 = findViewById(R.id.button1);
@@ -68,10 +65,8 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             @Override
             public void onClick(View v) {
                 Log.i(TAG, "Updating lightID: 1");
-                //create a new AsyncTask and update textView
+                //create a new AsyncTask
                 UpdateAsyncTask updateAsyncTask = new UpdateAsyncTask();
-                textViewItem.setText("Updating lightID: 1");
-                textViewItem.setBackgroundColor(Color.YELLOW);
                 //execute AsyncTask and passing it the primary key
                 updateAsyncTask.execute("1");
             }
@@ -107,14 +102,6 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         protected void onPostExecute(Boolean isSuccess) {
             super.onPostExecute(isSuccess);
             Log.i(TAG, "in UpdateAsyncTask onPostExecute os success: " + isSuccess);
-
-            if(isSuccess){
-                textViewItem.setText("Light status updated");
-                textViewItem.setBackgroundColor(Color.GREEN);
-            } else{
-                textViewItem.setText("Light status not updated");
-                textViewItem.setBackgroundColor(Color.YELLOW);
-            }
 
         }
     }
