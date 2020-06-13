@@ -1,4 +1,4 @@
-package com.example.test;
+package com.example.sumppumptracker.;
 
 import androidx.appcompat.app.AppCompatActivity;
 
