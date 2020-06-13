@@ -1,4 +1,4 @@
-package com.example.sumppumptracker.;
+package com.example.sumppumptracker;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -388,18 +388,6 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
         return percBW;
     }
-
-    Button buttonUpdate1 = findViewById(R.id.button1);
-    buttonUpdate1.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            Log.i("Dynamo", "Updating lightID: 1");
-            //create a new AsyncTask
-            UpdateAsyncTask updateAsyncTask = new UpdateAsyncTask();
-            //execute AsyncTask and passing it the primary key
-            updateAsyncTask.execute("1");
-        }
-    });
 
 
     /**
