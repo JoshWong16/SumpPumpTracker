@@ -390,10 +390,10 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     }
 
     Button buttonUpdate1 = findViewById(R.id.button1);
-        buttonUpdate1.setOnClickListener(new View.OnClickListener(){
+    buttonUpdate1.setOnClickListener(new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            Log.i(TAG, "Updating lightID: 1");
+            Log.i("Dynamo", "Updating lightID: 1");
             //create a new AsyncTask
             UpdateAsyncTask updateAsyncTask = new UpdateAsyncTask();
             //execute AsyncTask and passing it the primary key
@@ -401,39 +401,40 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         }
     });
 
-}
 
-/**
- * Async Task to update lightstatus
- */
+    /**
+     * Async Task to update lightstatus
+     */
 
-private class UpdateAsyncTask extends AsyncTask<String, Void, Boolean> {
+    private class UpdateAsyncTask extends AsyncTask<String, Void, Boolean> {
 
-    @Override
-    protected Boolean doInBackground(String... strings) {
-        boolean isSuccess = false;
+        @Override
+        protected Boolean doInBackground(String... strings) {
+            boolean isSuccess = false;
 
-        Log.i(TAG, "in UpdateAsyncTask doInBackground updating LightID: 1");
-        //create instance of DatabaseAccess
-        DatabaseAccess databaseAccess = DatabaseAccess.getInstance(MainActivity.this);
+            Log.i("Dynamo", "in UpdateAsyncTask doInBackground updating LightID: 1");
+            //create instance of DatabaseAccess
+            DatabaseAccess databaseAccess = DatabaseAccess.getInstance(MainActivity.this);
 
-        try {
-            //call updateLightStatus method
-            isSuccess = databaseAccess.updateLightStatus("1");
-        }catch (Exception e){
-            Log.i(TAG, "error updating contact: " + e.getMessage());
+            try {
+                //call updateLightStatus method
+                isSuccess = databaseAccess.updateLightStatus("1");
+            }catch (Exception e){
+                Log.i("Dynamo", "error updating contact: " + e.getMessage());
+            }
+
+            return isSuccess;
         }
 
-        return isSuccess;
+        @Override
+        protected void onPostExecute(Boolean isSuccess) {
+            super.onPostExecute(isSuccess);
+            Log.i("Dynamo", "in UpdateAsyncTask onPostExecute os success: " + isSuccess);
+
+        }
     }
 
-    @Override
-    protected void onPostExecute(Boolean isSuccess) {
-        super.onPostExecute(isSuccess);
-        Log.i(TAG, "in UpdateAsyncTask onPostExecute os success: " + isSuccess);
-
-    }
 }
 
-}
+
 
