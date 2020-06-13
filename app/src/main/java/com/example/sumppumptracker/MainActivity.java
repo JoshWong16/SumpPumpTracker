@@ -53,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     int counter;
     Timer timer;
 
+
     //app ui objects
     JavaCameraView cameraView;
     ImageView boxRed, boxGreen, boxYellow;
@@ -91,6 +92,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     }
 
     @SuppressLint("ClickableViewAccessibility")
+  
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,6 +100,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         //requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
+
 
         cameraView = (JavaCameraView)findViewById(R.id.cameraView);
         cameraView.setVisibility(SurfaceView.VISIBLE);
@@ -138,6 +141,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         boxGreen.setOnTouchListener(this);
         boxYellow.setLayoutParams(layoutParams3);
         boxYellow.setOnTouchListener(this);
+
     }
 
 
@@ -204,10 +208,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         rootLayout.invalidate();
         return true;
     }
-
-
-
-
+  
     @Override
     protected void onPause() {
         super.onPause();
@@ -220,6 +221,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
 
     @Override
+
     protected void onDestroy() {
         super.onDestroy();
         if(cameraView != null){
@@ -237,6 +239,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         }else{
             Log.d("MainActivity", "OpenCV not loaded");
             OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION, this, mLoaderCallback);
+
         }
     }
 
