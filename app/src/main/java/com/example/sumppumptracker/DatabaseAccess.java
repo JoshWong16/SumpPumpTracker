@@ -80,6 +80,7 @@ public class DatabaseAccess {
             boolean newStatus = !retrievedDoc.get("LightStatus").asBoolean();
             retrievedDoc.put("LightStatus", newStatus);
 
+            //creates a document object with the updated result
             Document updateResult = dbTable.updateItem(retrievedDoc, new Primitive(lightID),
                     new UpdateItemOperationConfig().withReturnValues(ReturnValue.UPDATED_NEW));
 
@@ -93,6 +94,16 @@ public class DatabaseAccess {
         }else{
             return false;
         }
+
+    }
+
+
+    /**
+     * Get light status of desired lightID
+     * @param lightID
+     * @return string format of light status
+     */
+    public String getLightStatus(String lightID){
 
     }
  
