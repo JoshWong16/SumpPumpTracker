@@ -407,7 +407,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
             try {
                 //call updateLightStatus method
-                isSuccess = databaseAccess.updateLightStatus("1");
+                isSuccess = databaseAccess.updateLightStatus(strings[0], Boolean.parseBoolean(strings[1]));
             }catch (Exception e){
                 Log.i(TAG, "error updating contact: " + e.getMessage());
             }
@@ -426,4 +426,4 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 }
 
 
- 
+
