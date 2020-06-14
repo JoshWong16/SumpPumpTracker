@@ -276,6 +276,9 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
 
         //float redPerc, greenPerc, yellowPerc;
+        //create a new AsyncTask
+        UpdateAsyncTask updateAsyncTask = new UpdateAsyncTask();
+
 
         TimerTask timerTask = new TimerTask() {
 
@@ -299,6 +302,8 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
             timer = new Timer("MyTimer");//create a new timer
             timer.scheduleAtFixedRate(timerTask, 30, 1000);//start timer in 30ms to increment  counter
+            //execute AsyncTask and passing it the primary key
+            updateAsyncTask.execute("1", "true");
             timerIsOn = true;
 
         }else if(timerIsOn && redPerc < 50){
@@ -306,6 +311,8 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
             timer.cancel();
             counter = 0;
+            //execute AsyncTask and passing it the primary key
+            updateAsyncTask.execute("1", "false");
             timerIsOn = false;
 
         }
