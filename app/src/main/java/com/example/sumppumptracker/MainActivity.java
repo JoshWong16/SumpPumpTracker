@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     boolean timerIsOn = false;
     int counter;
     Timer timer;
-
+    private String TAG = "SumpPumpDB";
 
     //app ui objects
     JavaCameraView cameraView;
@@ -345,6 +345,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
             return imgHSV;
         }
+
     }
 
 
@@ -400,7 +401,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         protected Boolean doInBackground(String... strings) {
             boolean isSuccess = false;
 
-            Log.i("Dynamo", "in UpdateAsyncTask doInBackground updating LightID: 1");
+            Log.i(TAG, "in UpdateAsyncTask doInBackground updating LightID: 1");
             //create instance of DatabaseAccess
             DatabaseAccess databaseAccess = DatabaseAccess.getInstance(MainActivity.this);
 
@@ -408,7 +409,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                 //call updateLightStatus method
                 isSuccess = databaseAccess.updateLightStatus("1");
             }catch (Exception e){
-                Log.i("Dynamo", "error updating contact: " + e.getMessage());
+                Log.i(TAG, "error updating contact: " + e.getMessage());
             }
 
             return isSuccess;
@@ -417,7 +418,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         @Override
         protected void onPostExecute(Boolean isSuccess) {
             super.onPostExecute(isSuccess);
-            Log.i("Dynamo", "in UpdateAsyncTask onPostExecute os success: " + isSuccess);
+            Log.i(TAG, "in UpdateAsyncTask onPostExecute os success: " + isSuccess);
 
         }
     }
@@ -425,4 +426,4 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 }
 
 
-
+ 
