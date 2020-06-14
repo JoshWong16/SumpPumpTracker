@@ -69,7 +69,7 @@ public class DatabaseAccess {
      * method called to update a given lightID's status
      * @param lightID
      */
-    public boolean updateLightStatus(String lightID){
+    public boolean updateLightStatus(String lightID, boolean lightStatus){
         Log.i(TAG, "in updateLightStatus");
 
         Document retrievedDoc = dbTable.getItem(new Primitive(lightID));
@@ -77,7 +77,7 @@ public class DatabaseAccess {
         if (retrievedDoc != null){
 
             //updates or switches the current light status
-            boolean newStatus = !retrievedDoc.get("LightStatus").asBoolean();
+            boolean newStatus = lightStatus;
             retrievedDoc.put("LightStatus", newStatus);
 
             //creates a document object with the updated result

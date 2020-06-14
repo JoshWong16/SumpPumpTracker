@@ -1,4 +1,4 @@
-package com.example.test;
+package com.example.sumppumptracker;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     boolean timerIsOn = false;
     int counter;
     Timer timer;
-
+    private String TAG = "SumpPumpDB";
 
     //app ui objects
     JavaCameraView cameraView;
@@ -276,6 +276,9 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
 
         //float redPerc, greenPerc, yellowPerc;
+        //create a new AsyncTask
+        UpdateAsyncTask updateAsyncTask = new UpdateAsyncTask();
+
 
         TimerTask timerTask = new TimerTask() {
 
@@ -299,6 +302,8 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
             timer = new Timer("MyTimer");//create a new timer
             timer.scheduleAtFixedRate(timerTask, 30, 1000);//start timer in 30ms to increment  counter
+            //execute AsyncTask and passing it the primary key
+            updateAsyncTask.execute("1", "true");
             timerIsOn = true;
 
         }else if(timerIsOn && redPerc < 50){
@@ -306,6 +311,8 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
             timer.cancel();
             counter = 0;
+            //execute AsyncTask and passing it the primary key
+            updateAsyncTask.execute("1", "false");
             timerIsOn = false;
 
         }
@@ -345,6 +352,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
             return imgHSV;
         }
+
     }
 
 
@@ -389,51 +397,40 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         return percBW;
     }
 
-    Button buttonUpdate1 = findViewById(R.id.button1);
-        buttonUpdate1.setOnClickListener(new View.OnClickListener(){
+
+    /**
+     * Async Task to update lightstatus
+     */
+
+    private class UpdateAsyncTask extends AsyncTask<String, Void, Boolean> {
+
         @Override
-        public void onClick(View v) {
-            Log.i(TAG, "Updating lightID: 1");
-            //create a new AsyncTask
-            UpdateAsyncTask updateAsyncTask = new UpdateAsyncTask();
-            //execute AsyncTask and passing it the primary key
-            updateAsyncTask.execute("1");
-        }
-    });
+        protected Boolean doInBackground(String... strings) {
+            boolean isSuccess = false;
 
-}
+            Log.i(TAG, "in UpdateAsyncTask doInBackground updating LightID: 1");
+            //create instance of DatabaseAccess
+            DatabaseAccess databaseAccess = DatabaseAccess.getInstance(MainActivity.this);
 
-/**
- * Async Task to update lightstatus
- */
+            try {
+                //call updateLightStatus method
+                isSuccess = databaseAccess.updateLightStatus(strings[0], Boolean.parseBoolean(strings[1]));
+            }catch (Exception e){
+                Log.i(TAG, "error updating contact: " + e.getMessage());
+            }
 
-private class UpdateAsyncTask extends AsyncTask<String, Void, Boolean> {
-
-    @Override
-    protected Boolean doInBackground(String... strings) {
-        boolean isSuccess = false;
-
-        Log.i(TAG, "in UpdateAsyncTask doInBackground updating LightID: 1");
-        //create instance of DatabaseAccess
-        DatabaseAccess databaseAccess = DatabaseAccess.getInstance(MainActivity.this);
-
-        try {
-            //call updateLightStatus method
-            isSuccess = databaseAccess.updateLightStatus("1");
-        }catch (Exception e){
-            Log.i(TAG, "error updating contact: " + e.getMessage());
+            return isSuccess;
         }
 
-        return isSuccess;
+        @Override
+        protected void onPostExecute(Boolean isSuccess) {
+            super.onPostExecute(isSuccess);
+            Log.i(TAG, "in UpdateAsyncTask onPostExecute os success: " + isSuccess);
+
+        }
     }
 
-    @Override
-    protected void onPostExecute(Boolean isSuccess) {
-        super.onPostExecute(isSuccess);
-        Log.i(TAG, "in UpdateAsyncTask onPostExecute os success: " + isSuccess);
-
-    }
 }
 
-}
+
 
