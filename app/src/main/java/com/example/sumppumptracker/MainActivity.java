@@ -1,30 +1,30 @@
 package com.example.sumppumptracker;
 
+
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.hardware.Camera;
-import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
-import android.util.AttributeSet;
+import android.provider.ContactsContract;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
-import com.example.sumppumptracker.DatabaseAccess;
 
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
@@ -38,6 +38,7 @@ import org.opencv.core.Scalar;
 import org.opencv.core.CvType;
 import org.opencv.imgproc.Imgproc;
 
+
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -47,24 +48,34 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     int colorID = 3; //0-green   1-red   2-yellow   3-hsv
     int red, green, blue;
     Mat imgHSV, imgThreshold;
-    float redPerc, greenPerc, yellowPerc;
+    float redPerc, yellowPerc, float1Perc, float2Perc, float3Perc, float4Perc, pump1Perc, pump2Perc;
     int xRed, yRed, xGreen, yGreen, xYellow, yYellow;
-    int xdimension = 1920;
-    int ydimension = 1080;
+    //int xdimension = 1920;
+    //int ydimension = 1080;
+    int xdimension, ydimension, xResolution, yResolution;
     int xdelta,ydelta;
     boolean timerIsOn = false;
     int counter;
     Timer timer;
-    private String TAG = "SumpPumpDB";
+
+    private clientInterface clientIF;
+    private Client client;
+    private static final String SERVER_IP = "192.168.0.13";
+    private static final int SERVER_PORT = 11967;
+
 
     //app ui objects
     JavaCameraView cameraView;
-    ImageView boxRed, boxGreen, boxYellow;
+    ImageView boxRed, boxYellow, boxFloat1, boxFloat2, boxFloat3, boxFloat4, boxPump1, boxPump2;
     ViewGroup rootLayout;
-    TextView text;
+    TextView floatPerc, pumpPerc;
     Button btnRed, btnGreen, btnYellow, btnHSV;
 
-    RelativeLayout.LayoutParams layoutParams1, layoutParams2, layoutParams3;
+
+    RelativeLayout.LayoutParams layoutParamsRed, layoutParamsYellow, layoutParamsF1, layoutParamsF2, layoutParamsF3, layoutParamsF4, layoutParamsP1, layoutParamsP2;
+
+    NotificationManagerCompat notificationManager;
+    NotificationCompat.Builder builder;
 
 
 
@@ -95,15 +106,18 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     }
 
     @SuppressLint("ClickableViewAccessibility")
-  
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        //requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
 
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+
+        xResolution = displayMetrics.widthPixels;//1080
+        yResolution = displayMetrics.heightPixels;//1794
 
         cameraView = (JavaCameraView)findViewById(R.id.cameraView);
         cameraView.setVisibility(SurfaceView.VISIBLE);
@@ -112,10 +126,18 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
         rootLayout = (ViewGroup) findViewById(R.id.activity_main);
         boxRed = (ImageView) findViewById(R.id.boxRed);
-        boxGreen = (ImageView) findViewById(R.id.boxGreen);
         boxYellow = (ImageView) findViewById(R.id.boxYellow);
 
-        text = (TextView) findViewById(R.id.colourSelec);
+        boxFloat1 = (ImageView) findViewById(R.id.boxFloat1);
+        boxFloat2 = (ImageView) findViewById(R.id.boxFloat2);
+        boxFloat3 = (ImageView) findViewById(R.id.boxFloat3);
+        boxFloat4 = (ImageView) findViewById(R.id.boxFloat4);
+
+        boxPump1 = (ImageView) findViewById(R.id.boxPump1);
+        boxPump2 = (ImageView) findViewById(R.id.boxPump2);
+
+        floatPerc = (TextView) findViewById(R.id.floatPerc);
+        pumpPerc = (TextView) findViewById(R.id.pumpPerc);
 
         btnRed = (Button) findViewById(R.id.btnRed);
         btnGreen = (Button) findViewById(R.id.btnGreen);
@@ -127,25 +149,84 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         btnYellow.setOnClickListener(this);
         btnHSV.setOnClickListener(this);
 
-        layoutParams1 = new RelativeLayout.LayoutParams(100, 100);
-        layoutParams2 = new RelativeLayout.LayoutParams(100, 100);
-        layoutParams3 = new RelativeLayout.LayoutParams(100, 100);
+        layoutParamsRed = new RelativeLayout.LayoutParams(100, 100);
+        layoutParamsYellow = new RelativeLayout.LayoutParams(100, 100);
 
-        layoutParams1.leftMargin = 60;
-        layoutParams1.topMargin = 0;
-        layoutParams2.leftMargin = 60;
-        layoutParams2.topMargin = 110;
-        layoutParams3.leftMargin = 60;
-        layoutParams3.topMargin = 220;
+        layoutParamsF1 = new RelativeLayout.LayoutParams(100, 100);
+        layoutParamsF2 = new RelativeLayout.LayoutParams(100, 100);
+        layoutParamsF3 = new RelativeLayout.LayoutParams(100, 100);
+        layoutParamsF4 = new RelativeLayout.LayoutParams(100, 100);
 
-        boxRed.setLayoutParams(layoutParams1);
+        layoutParamsP1 = new RelativeLayout.LayoutParams(100,100);
+        layoutParamsP2 = new RelativeLayout.LayoutParams(100,100);
+
+        layoutParamsRed.leftMargin = 60;
+        layoutParamsRed.topMargin = 0;
+        layoutParamsYellow.leftMargin = 60;
+        layoutParamsYellow.topMargin = 110;
+
+        layoutParamsF1.leftMargin = 170;
+        layoutParamsF1.topMargin = 0;
+        layoutParamsF2.leftMargin = 170;
+        layoutParamsF2.topMargin = 110;
+        layoutParamsF3.leftMargin = 170;
+        layoutParamsF3.topMargin = 220;
+        layoutParamsF4.leftMargin = 170;
+        layoutParamsF4.topMargin = 330;
+
+        layoutParamsP1.leftMargin = 280;
+        layoutParamsP1.topMargin = 0;
+        layoutParamsP2.leftMargin = 280;
+        layoutParamsP2.topMargin = 110;
+
+        boxRed.setLayoutParams(layoutParamsRed);
         boxRed.setOnTouchListener(this);
-        boxGreen.setLayoutParams(layoutParams2);
-        boxGreen.setOnTouchListener(this);
-        boxYellow.setLayoutParams(layoutParams3);
+        boxYellow.setLayoutParams(layoutParamsYellow);
         boxYellow.setOnTouchListener(this);
 
+        boxFloat1.setLayoutParams(layoutParamsF1);
+        boxFloat1.setOnTouchListener(this);
+        boxFloat2.setLayoutParams(layoutParamsF2);
+        boxFloat2.setOnTouchListener(this);
+        boxFloat3.setLayoutParams(layoutParamsF3);
+        boxFloat3.setOnTouchListener(this);
+        boxFloat4.setLayoutParams(layoutParamsF4);
+        boxFloat4.setOnTouchListener(this);
+
+        boxPump1.setLayoutParams(layoutParamsP1);
+        boxPump1.setOnTouchListener(this);
+        boxPump2.setLayoutParams(layoutParamsP2);
+        boxPump2.setOnTouchListener(this);
+
+        Log.i("MainActivity", "App Initialized Successfully!");
+
+        createNotificationChannel();
+
+        builder = new NotificationCompat.Builder(this, "lemubitA")
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setContentTitle("float 4 is on")
+                .setContentText("float 4 is on")
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+
+        notificationManager = NotificationManagerCompat.from(this);
     }
+
+    private void createNotificationChannel() {
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = "studentChannel";
+            String description = "Channel for student notifications";
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel("lemubitA", name, importance);
+            channel.setDescription(description);
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+
 
 
     @Override
@@ -190,20 +271,25 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                 layoutParams.bottomMargin = -250;
                 v.setLayoutParams(layoutParams);
 
-                if(layoutParams.leftMargin < 60){
-                    layoutParams.leftMargin = 60;
+                int x = (xResolution - xdimension)/2;
+                int y = (yResolution - ydimension)/2;
+
+
+                //keep the box inide the camera's area
+                if(layoutParams.leftMargin < x){
+                    layoutParams.leftMargin = x;
 
                 }
                 if(layoutParams.topMargin < 0) {
                     layoutParams.topMargin = 0;
 
                 }
-                if(layoutParams.topMargin > (ydimension - 100)) {
-                    layoutParams.topMargin = (ydimension - 100);
+                if(layoutParams.topMargin > yResolution-100) {
+                    layoutParams.topMargin = yResolution-100;
 
                 }
-                if(layoutParams.leftMargin > (xdimension - 40)) {
-                    layoutParams.leftMargin = (xdimension - 40);
+                if(layoutParams.leftMargin > xdimension+x-100) {
+                    layoutParams.leftMargin = xdimension+x-100;
                 }
 
                 break;
@@ -211,25 +297,29 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         rootLayout.invalidate();
         return true;
     }
-  
+
+
+
+
     @Override
     protected void onPause() {
         super.onPause();
         if(cameraView != null){
             cameraView.disableView();
         }
+        Log.d("mainactivity", "camera paused");
     }
 
 
 
 
     @Override
-
     protected void onDestroy() {
         super.onDestroy();
         if(cameraView != null){
             cameraView.disableView();
         }
+        Log.d("mainactivity", "camera destroyed");
     }
 
 
@@ -242,8 +332,8 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         }else{
             Log.d("MainActivity", "OpenCV not loaded");
             OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION, this, mLoaderCallback);
-
         }
+        Log.d("mainactivity", "camera resumed");
     }
 
 
@@ -257,6 +347,11 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         imgHSV = new Mat(width, height, CvType.CV_8UC4);
         imgThreshold = new Mat(width, height, CvType.CV_8UC4);
 
+        xdimension = width;//960
+        ydimension = height;//1280
+
+        Log.d("mainactivity", "camera started");
+
     }
 
 
@@ -267,6 +362,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     @Override
     public void onCameraViewStopped() {
         imgHSV.release();
+        Log.d("mainactivity", "camera stopped");
     }
 
 
@@ -276,9 +372,6 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
 
         //float redPerc, greenPerc, yellowPerc;
-        //create a new AsyncTask
-        UpdateAsyncTask updateAsyncTask = new UpdateAsyncTask();
-
 
         TimerTask timerTask = new TimerTask() {
 
@@ -293,7 +386,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         //scHigh = new Scalar(iHighH, iHighS, iHighV);
 
         Imgproc.cvtColor(inputFrame.rgba(), imgHSV, Imgproc.COLOR_BGR2HSV);//process image and convert it to hsv
-
+        /*
         Core.inRange(imgHSV, new Scalar(colorRange[1][0], colorRange[1][1], colorRange[1][2]), new Scalar(colorRange[1][3], colorRange[1][4], colorRange[1][5]), imgThreshold);
         redPerc = getPercBW((boxRed.getLeft()-60), boxRed.getTop());
 
@@ -302,8 +395,6 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
             timer = new Timer("MyTimer");//create a new timer
             timer.scheduleAtFixedRate(timerTask, 30, 1000);//start timer in 30ms to increment  counter
-            //execute AsyncTask and passing it the primary key
-            updateAsyncTask.execute("1", "true");
             timerIsOn = true;
 
         }else if(timerIsOn && redPerc < 50){
@@ -311,8 +402,6 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
             timer.cancel();
             counter = 0;
-            //execute AsyncTask and passing it the primary key
-            updateAsyncTask.execute("1", "false");
             timerIsOn = false;
 
         }
@@ -320,8 +409,19 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         Core.inRange(imgHSV, new Scalar(colorRange[2][0], colorRange[2][1], colorRange[2][2]), new Scalar(colorRange[2][3], colorRange[2][4], colorRange[2][5]), imgThreshold);
         yellowPerc = getPercBW((boxYellow.getLeft()-60), boxYellow.getTop());
 
+         */
+
         Core.inRange(imgHSV, new Scalar(colorRange[0][0], colorRange[0][1], colorRange[0][2]), new Scalar(colorRange[0][3], colorRange[0][4], colorRange[0][5]), imgThreshold);
-        greenPerc = getPercBW((boxGreen.getLeft()-60), boxGreen.getTop());
+        /*float1Perc = getPercBW((boxFloat1.getLeft()-60), boxFloat1.getTop());
+        float2Perc = getPercBW((boxFloat2.getLeft()-60), boxFloat2.getTop());
+        float3Perc = getPercBW((boxFloat3.getLeft()-60), boxFloat3.getTop());
+        float4Perc = getPercBW((boxFloat4.getLeft()-60), boxFloat4.getTop());
+        pump1Perc = getPercBW((boxPump1.getLeft()-60), boxPump1.getTop());
+        pump2Perc = getPercBW((boxPump2.getLeft()-60), boxPump2.getTop());
+*/
+        if(float4Perc > 50){
+            notificationManager.notify(100, builder.build());
+        }
 
 
 
@@ -329,7 +429,8 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             @SuppressLint("SetTextI18n")
             @Override
             public void run() {
-                text.setText("Green: "+(int)greenPerc+",\nRed: "+(int)redPerc+",\nYellow: "+(int)yellowPerc);
+                floatPerc.setText("float 1: "+(int)float1Perc+"\nfloat 2: "+(int)float2Perc+"\nfloat 3: "+(int)float3Perc+"\nfloat 4: "+(int)float4Perc);
+                pumpPerc.setText("pump 1: "+(int)pump1Perc+"\npump 2: "+(int)pump2Perc);
             }
         });
 
@@ -337,22 +438,21 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         if(colorID != 3) {//green
             Core.inRange(imgHSV, new Scalar(colorRange[colorID][0], colorRange[colorID][1], colorRange[colorID][2]), new Scalar(colorRange[colorID][3], colorRange[colorID][4], colorRange[colorID][5]), imgThreshold);
 
-            Imgproc.rectangle(imgThreshold, new Point((boxRed.getLeft() - 60), boxRed.getTop()), new Point((boxRed.getLeft() + 38), (boxRed.getTop() + 99)), new Scalar(255, 0, 255), 1);
-            Imgproc.rectangle(imgThreshold, new Point((boxGreen.getLeft() - 60), boxGreen.getTop()), new Point((boxGreen.getLeft() + 38), (boxGreen.getTop() + 99)), new Scalar(255, 0, 255), 1);
+            /*Imgproc.rectangle(imgThreshold, new Point((boxRed.getLeft() - 60), boxRed.getTop()), new Point((boxRed.getLeft() + 38), (boxRed.getTop() + 99)), new Scalar(255, 0, 255), 1);
+            Imgproc.rectangle(imgThreshold, new Point((boxFloat1.getLeft() - 60), boxFloat1.getTop()), new Point((boxFloat1.getLeft() + 38), (boxFloat1.getTop() + 99)), new Scalar(255, 0, 255), 1);
             Imgproc.rectangle(imgThreshold, new Point((boxYellow.getLeft() - 60), boxYellow.getTop()), new Point((boxYellow.getLeft() + 38), (boxYellow.getTop() + 99)), new Scalar(255, 0, 255), 1);
             Imgproc.rectangle(imgThreshold, new Point(0, 0), new Point(imgThreshold.width() - 1, imgThreshold.height() - 1), new Scalar(255, 0, 255), 2);//draw border
-
+*/
             return imgThreshold;
 
         }else{//hsv
             Imgproc.rectangle(imgHSV, new Point((boxRed.getLeft() - 60), boxRed.getTop()), new Point((boxRed.getLeft() + 38), (boxRed.getTop() + 99)), new Scalar(255, 0, 255), 1);
-            Imgproc.rectangle(imgHSV, new Point((boxGreen.getLeft() - 60), boxGreen.getTop()), new Point((boxGreen.getLeft() + 38), (boxGreen.getTop() + 99)), new Scalar(255, 0, 255), 1);
+            Imgproc.rectangle(imgHSV, new Point((boxFloat1.getLeft() - 60), boxFloat1.getTop()), new Point((boxFloat1.getLeft() + 38), (boxFloat1.getTop() + 99)), new Scalar(255, 0, 255), 1);
             Imgproc.rectangle(imgHSV, new Point((boxYellow.getLeft() - 60), boxYellow.getTop()), new Point((boxYellow.getLeft() + 38), (boxYellow.getTop() + 99)), new Scalar(255, 0, 255), 1);
             Imgproc.rectangle(imgHSV, new Point(0, 0), new Point(imgThreshold.width() - 1, imgThreshold.height() - 1), new Scalar(255, 0, 255), 2);//draw border
 
             return imgHSV;
         }
-
     }
 
 
@@ -396,41 +496,5 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
         return percBW;
     }
-
-
-    /**
-     * Async Task to update lightstatus
-     */
-
-    private class UpdateAsyncTask extends AsyncTask<String, Void, Boolean> {
-
-        @Override
-        protected Boolean doInBackground(String... strings) {
-            boolean isSuccess = false;
-
-            Log.i(TAG, "in UpdateAsyncTask doInBackground updating LightID: 1");
-            //create instance of DatabaseAccess
-            DatabaseAccess databaseAccess = DatabaseAccess.getInstance(MainActivity.this);
-
-            try {
-                //call updateLightStatus method
-                isSuccess = databaseAccess.updateLightStatus(strings[0], Boolean.parseBoolean(strings[1]));
-            }catch (Exception e){
-                Log.i(TAG, "error updating contact: " + e.getMessage());
-            }
-
-            return isSuccess;
-        }
-
-        @Override
-        protected void onPostExecute(Boolean isSuccess) {
-            super.onPostExecute(isSuccess);
-            Log.i(TAG, "in UpdateAsyncTask onPostExecute os success: " + isSuccess);
-
-        }
-    }
-
 }
-
-
 
