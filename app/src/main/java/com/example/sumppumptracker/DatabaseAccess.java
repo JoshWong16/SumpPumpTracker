@@ -83,8 +83,7 @@ public class DatabaseAccess {
             retrievedDoc.put(lightID, lightStatus);
 
             //creates a document object with the updated result
-            Document updateResult = dbTable.updateItem(retrievedDoc, new Primitive(lightID),
-                    new UpdateItemOperationConfig().withReturnValues(ReturnValue.UPDATED_NEW));
+            Document updateResult = dbTable.updateItem(retrievedDoc, new UpdateItemOperationConfig().withReturnValues(ReturnValue.UPDATED_NEW));
 
             try{
                 Log.i(TAG, "updateResult: " + Document.toJson(updateResult));
