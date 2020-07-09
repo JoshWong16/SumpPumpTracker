@@ -521,8 +521,9 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             String subject = jwt.getSubject();
 
             try {
+                //retrieve userItem from database and update desired lightStatuses
                 userItem = databaseAccess.getUserItem(subject);
-                isSuccess = databaseAccess.updateLightStatus(strings[0], Boolean.parseBoolean(strings[1]), userItem);
+                isSuccess = databaseAccess.updateLightStatus(strings[0], strings[1], userItem);
 
             }catch (Exception e){
                 Log.e(AppSettings.tag, "error getting light statuses");
