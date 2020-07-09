@@ -72,15 +72,14 @@ public class DatabaseAccess {
      * method called to update a given lightID's status
      * @param lightID
      */
-    public boolean updateLightStatus(String lightID, boolean lightStatus, Document retrievedDoc){
+    public boolean updateLightStatus(String lightID, String lightStatus, Document retrievedDoc){
         Log.i(TAG, "in updateLightStatus");
 
 
         if (retrievedDoc != null){
 
             //updates or switches the current light status
-            boolean newStatus = lightStatus;
-            retrievedDoc.put(lightID, newStatus);
+            retrievedDoc.put(lightID, lightStatus);
 
             //creates a document object with the updated result
             Document updateResult = dbTable.updateItem(retrievedDoc, new Primitive(lightID),
@@ -142,6 +141,16 @@ public class DatabaseAccess {
             Log.e(AppSettings.tag, "error retrieving userItem from Dynamo");
             return null;
         }
+    }
+
+    /**
+     * updates the array of pump times in dynamoDB
+     * @param time it took for pump to empty water
+     * @param numPump number of pump
+     * @param userItem
+     */
+    public void updatePumpTime(int time, int numPump, Document userItem){
+
     }
 
 }
