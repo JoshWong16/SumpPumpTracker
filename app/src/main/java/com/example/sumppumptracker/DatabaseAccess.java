@@ -1,12 +1,11 @@
 package com.example.sumppumptracker;
 
-import android.app.ActionBar;
 import android.content.Context;
-import android.provider.ContactsContract;
-import android.provider.DocumentsContract;
 import android.util.Log;
 
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
+import com.amazonaws.mobileconnectors.dynamodbv2.document.ScanOperationConfig;
+import com.amazonaws.mobileconnectors.dynamodbv2.document.Search;
 import com.amazonaws.mobileconnectors.dynamodbv2.document.Table;
 import com.amazonaws.mobileconnectors.dynamodbv2.document.UpdateItemOperationConfig;
 import com.amazonaws.mobileconnectors.dynamodbv2.document.datatype.Document;
@@ -17,6 +16,9 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.amazonaws.services.dynamodbv2.model.ReturnValue;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * Purpose of class is to initialize connection to DynamoDB
@@ -39,11 +41,12 @@ public class DatabaseAccess {
     */
     private static volatile DatabaseAccess instance;
 
-    private DatabaseAccess(Context context){
+    private DatabaseAccess(Context context, HashMap<String, String> logins){
         this.context = context;
 
         //Create a new credentials provider
         credentialsProvider =  new CognitoCachingCredentialsProvider(context, COGNITO_IDENTITY_POOL_ID, COGNITO_ITENTITY_POOL_REGION);
+        credentialsProvider.setLogins(logins);
         //Create a connection to the DynamoDB service
         dbClient = new AmazonDynamoDBClient(credentialsProvider);
         //Must set dbClient region here or else it defaults to us_east_1
@@ -58,9 +61,9 @@ public class DatabaseAccess {
      * Ensures we always use the same instance of the DatabaseAccess class
      * Object is synchronized so that only one thread can run the instance at a time
      */
-    public static synchronized DatabaseAccess getInstance(Context context){
+    public static synchronized DatabaseAccess getInstance(Context context, HashMap<String, String> logins){
         if (instance == null) {
-            instance = new DatabaseAccess(context);
+            instance = new DatabaseAccess(context, logins);
         }
         return instance;
     }
@@ -99,12 +102,47 @@ public class DatabaseAccess {
 
 
     /**
-     * Get light status of desired lightID
-     * @param lightID
-     * @return string format of light status
+     * Get light status of all lightID's
+     * @param
+     * @return List of document objects containing each LightID's lightstatus
      */
-    public String getLightStatus(String lightID){
-        return lightID;
+    public List<Document> getAllLightStatus(){
+        //initialize scanconfig object
+        ScanOperationConfig scanOperationConfig = new ScanOperationConfig();
+        //create array of attributes to retrieve from each item
+        List<String> attributeList = new ArrayList<>();
+        attributeList.add("LightStatus");
+
+        //Access table and return scan results
+        scanOperationConfig.withAttributesToGet(attributeList);
+        Search searchResult = dbTable.scan(scanOperationConfig);
+        return searchResult.getAllResults();
+    }
+
+    /**
+     * Get light status of specified light
+     * @param: LightStatus#
+     * @return: state of the light
+     */
+    public String getLightStatus(String lightID, Document user){
+        String lightStatus = String.valueOf(user.get(lightID));
+        return lightStatus;
+    }
+
+    /**
+     * Get User item from database
+     * @param: sub of user (from IDtoken)
+     * @return: User item form DynamoDB as document object
+     */
+    public Document getUserItem(String sub){
+        Document retrievedDoc = dbTable.getItem(new Primitive(sub));
+        if(retrievedDoc != null){
+            return retrievedDoc;
+        }
+        else{
+            Log.e(AppSettings.tag, "error retrieving userItem from Dynamo");
+            return null;
+        }
     }
 
 }

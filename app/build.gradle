@@ -43,4 +43,5 @@ dependencies {
     implementation 'com.amazonaws:aws-android-sdk-ddb:2.6.+'
     implementation 'com.amazonaws:aws-android-sdk-ddb-document:2.6.+'
     implementation 'com.auth0.android:jwtdecode:2.0.0'
+    implementation 'com.amazonaws:aws-android-sdk-cognitoidentityprovider:2.6.+'
 }

@@ -410,16 +410,16 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
          */
 
         Core.inRange(imgHSV, new Scalar(colorRange[0][0], colorRange[0][1], colorRange[0][2]), new Scalar(colorRange[0][3], colorRange[0][4], colorRange[0][5]), imgThreshold);
-        /*float1Perc = getPercBW((boxFloat1.getLeft()-60), boxFloat1.getTop());
+        float1Perc = getPercBW((boxFloat1.getLeft()-60), boxFloat1.getTop());
         float2Perc = getPercBW((boxFloat2.getLeft()-60), boxFloat2.getTop());
         float3Perc = getPercBW((boxFloat3.getLeft()-60), boxFloat3.getTop());
         float4Perc = getPercBW((boxFloat4.getLeft()-60), boxFloat4.getTop());
         pump1Perc = getPercBW((boxPump1.getLeft()-60), boxPump1.getTop());
         pump2Perc = getPercBW((boxPump2.getLeft()-60), boxPump2.getTop());
-*/
-        if(float4Perc > 50){
+
+        /*if(float4Perc > 50){
             notificationManager.notify(100, builder.build());
-        }
+        }*/
 
 
 
