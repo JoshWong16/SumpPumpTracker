@@ -11,6 +11,7 @@ import android.app.NotificationManager;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -26,6 +27,9 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.amazonaws.mobileconnectors.dynamodbv2.document.datatype.Document;
+import com.auth0.android.jwt.JWT;
+
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.JavaCameraView;
@@ -39,6 +43,8 @@ import org.opencv.core.CvType;
 import org.opencv.imgproc.Imgproc;
 
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -494,5 +500,48 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
         return percBW;
     }
+
+    /**
+     * Async Task to get all light statuses
+     */
+    private class UpdateAsyncTask extends AsyncTask<String, Void, Boolean> {
+        Document userItem;
+        boolean isSuccess = false;
+        @Override
+        protected Boolean doInBackground(String... strings) {
+            Log.d(AppSettings.tag, "In UpdateAsyncTask DoInBackground");
+
+            String idToken = getIntent().getStringExtra("idToken");
+            HashMap<String, String> logins = new HashMap<String, String>();
+            logins.put("cognito-idp.us-west-2.amazonaws.com/us-west-2_kZujWKyqd", idToken);
+
+            //create instance of DatabaseAccess and decode idToken
+            DatabaseAccess databaseAccess = DatabaseAccess.getInstance(MainActivity.this, logins);
+            JWT jwt = new JWT(idToken);
+            String subject = jwt.getSubject();
+
+            try {
+                userItem = databaseAccess.getUserItem(subject);
+                isSuccess = databaseAccess.updateLightStatus(strings[0], Boolean.parseBoolean(strings[1]), userItem);
+
+            }catch (Exception e){
+                Log.e(AppSettings.tag, "error getting light statuses");
+            }
+
+            return isSuccess;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean isSuccess) {
+            super.onPostExecute(isSuccess);
+            Log.d(AppSettings.tag, "In UpdateAsyncTask onPostExecute: " + isSuccess);
+
+        }
+
+
+    }
+
+
+
 }
 

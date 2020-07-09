@@ -30,7 +30,7 @@ public class DatabaseAccess {
 
     private final String COGNITO_IDENTITY_POOL_ID = "us-west-2:8f70a2b5-fb95-452b-8240-4cfe1ce3974a";
     private final Regions COGNITO_ITENTITY_POOL_REGION = Regions.US_WEST_2;
-    private final String DYNAMODB_TABLE = "SumpPumpApp";
+    private final String DYNAMODB_TABLE = "SumpPumpUsers";
     private Context context;
     private CognitoCachingCredentialsProvider credentialsProvider;
     private AmazonDynamoDBClient dbClient;
@@ -72,16 +72,15 @@ public class DatabaseAccess {
      * method called to update a given lightID's status
      * @param lightID
      */
-    public boolean updateLightStatus(String lightID, boolean lightStatus){
+    public boolean updateLightStatus(String lightID, boolean lightStatus, Document retrievedDoc){
         Log.i(TAG, "in updateLightStatus");
 
-        Document retrievedDoc = dbTable.getItem(new Primitive(lightID));
 
         if (retrievedDoc != null){
 
             //updates or switches the current light status
             boolean newStatus = lightStatus;
-            retrievedDoc.put("LightStatus", newStatus);
+            retrievedDoc.put(lightID, newStatus);
 
             //creates a document object with the updated result
             Document updateResult = dbTable.updateItem(retrievedDoc, new Primitive(lightID),
