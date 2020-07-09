@@ -72,9 +72,10 @@ public class DatabaseAccess {
      * method called to update a given lightID's status
      * @param lightID
      */
-    public boolean updateLightStatus(String lightID, String lightStatus, Document retrievedDoc){
+    public boolean updateLightStatus(String lightID, String lightStatus, String sub){
         Log.i(TAG, "in updateLightStatus");
 
+        Document retrievedDoc = dbTable.getItem(new Primitive(sub));
 
         if (retrievedDoc != null){
 
