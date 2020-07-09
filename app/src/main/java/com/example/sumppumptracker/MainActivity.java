@@ -522,8 +522,8 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
             try {
                 //retrieve userItem from database and update desired lightStatuses
-                userItem = databaseAccess.getUserItem(subject);
-                isSuccess = databaseAccess.updateLightStatus(strings[0], strings[1], userItem);
+//                userItem = databaseAccess.getUserItem(subject);
+                isSuccess = databaseAccess.updateLightStatus(strings[0], strings[1], subject);
 
             }catch (Exception e){
                 Log.e(AppSettings.tag, "error getting light statuses");
