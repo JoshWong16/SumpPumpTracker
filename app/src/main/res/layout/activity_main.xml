@@ -11,22 +11,117 @@
 
 
     <org.opencv.android.JavaCameraView
-
         android:id="@+id/cameraView"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent" />
 
     <TextView
-        android:id="@+id/colourSelec"
+        android:id="@+id/floatPerc"
         android:layout_width="150dp"
         android:layout_height="150dp"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="20dp"
         android:rotation="-90"
-        android:lines="3"
-        android:text="Green: 0,\nRed: 0,\nYellow: 0"
+        android:lines="4"
+        android:text="float 1: 0\nfloat 2: 0\nfloat 3: 0\nfloat 4: 0"
         android:textColor="#8BC34A"
-        android:textSize="24sp" />
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/pumpPerc"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_alignBottom="@+id/floatPerc"
+        android:layout_marginBottom="110dp"
+        android:rotation="-90"
+        android:lines="2"
+        android:text="pump 1: 0\npump 2: 0"
+        android:textColor="#8BC34A"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/txtFloat1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/boxFloat1"
+        android:layout_alignTop="@+id/boxFloat1"
+        android:layout_alignRight="@+id/boxFloat1"
+        android:layout_alignBottom="@+id/boxFloat1"
+        android:rotation="-90"
+        android:layout_margin="1dp"
+        android:gravity="center"
+        android:text="float 1"
+        android:textColor="@android:color/holo_red_light" />
+
+    <TextView
+        android:id="@+id/txtFloat2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/boxFloat2"
+        android:layout_alignTop="@+id/boxFloat2"
+        android:layout_alignRight="@+id/boxFloat2"
+        android:layout_alignBottom="@+id/boxFloat2"
+        android:rotation="-90"
+        android:layout_margin="1dp"
+        android:gravity="center"
+        android:text="float 2"
+        android:textColor="@android:color/holo_red_light" />
+
+    <TextView
+        android:id="@+id/txtFloat3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/boxFloat3"
+        android:layout_alignTop="@+id/boxFloat3"
+        android:layout_alignRight="@+id/boxFloat3"
+        android:layout_alignBottom="@+id/boxFloat3"
+        android:rotation="-90"
+        android:layout_margin="1dp"
+        android:gravity="center"
+        android:text="float 3"
+        android:textColor="@android:color/holo_red_light" />
+
+    <TextView
+        android:id="@+id/txtFloat4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/boxFloat4"
+        android:layout_alignTop="@+id/boxFloat4"
+        android:layout_alignRight="@+id/boxFloat4"
+        android:layout_alignBottom="@+id/boxFloat4"
+        android:rotation="-90"
+        android:layout_margin="1dp"
+        android:gravity="center"
+        android:text="float 4"
+        android:textColor="@android:color/holo_red_light" />
+
+    <TextView
+        android:id="@+id/txtPump1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/boxPump1"
+        android:layout_alignTop="@+id/boxPump1"
+        android:layout_alignRight="@+id/boxPump1"
+        android:layout_alignBottom="@+id/boxPump1"
+        android:rotation="-90"
+        android:layout_margin="1dp"
+        android:gravity="center"
+        android:text="pump 1"
+        android:textColor="@android:color/holo_red_light" />
+
+    <TextView
+        android:id="@+id/txtPump2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/boxPump2"
+        android:layout_alignTop="@+id/boxPump2"
+        android:layout_alignRight="@+id/boxPump2"
+        android:layout_alignBottom="@+id/boxPump2"
+        android:rotation="-90"
+        android:layout_margin="1dp"
+        android:gravity="center"
+        android:text="pump 2"
+        android:textColor="@android:color/holo_red_light" />
 
     <ImageView
         android:id="@+id/boxRed"
@@ -39,7 +134,17 @@
         app:srcCompat="@android:color/holo_red_light" />
 
     <ImageView
-        android:id="@+id/boxGreen"
+        android:id="@+id/boxYellow"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="240dp"
+        android:alpha="0.5"
+        app:srcCompat="@android:color/holo_orange_light" />
+
+    <ImageView
+        android:id="@+id/boxFloat1"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_alignParentTop="true"
@@ -49,14 +154,54 @@
         app:srcCompat="@android:color/holo_green_light" />
 
     <ImageView
-        android:id="@+id/boxYellow"
+        android:id="@+id/boxFloat2"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="240dp"
+        android:layout_marginTop="180dp"
         android:alpha="0.5"
-        app:srcCompat="@android:color/holo_orange_light" />
+        app:srcCompat="@android:color/holo_green_light" />
+
+    <ImageView
+        android:id="@+id/boxFloat3"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="180dp"
+        android:alpha="0.5"
+        app:srcCompat="@android:color/holo_green_light" />
+
+    <ImageView
+        android:id="@+id/boxFloat4"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="180dp"
+        android:alpha="0.5"
+        app:srcCompat="@android:color/holo_green_light" />
+
+    <ImageView
+        android:id="@+id/boxPump1"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="180dp"
+        android:alpha="0.5"
+        app:srcCompat="@android:color/holo_green_light" />
+
+    <ImageView
+        android:id="@+id/boxPump2"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="180dp"
+        android:alpha="0.5"
+        app:srcCompat="@android:color/holo_green_light" />
 
     <Button
         android:id="@+id/btnRed"
@@ -102,5 +247,5 @@
         android:rotation="-90"
         android:text="HSV" />
 
-</RelativeLayout>
 
+</RelativeLayout>

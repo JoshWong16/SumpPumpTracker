@@ -58,8 +58,6 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     int counter;
     Timer timer;
 
-    private clientInterface clientIF;
-    private Client client;
     private static final String SERVER_IP = "192.168.0.13";
     private static final int SERVER_PORT = 11967;
 
