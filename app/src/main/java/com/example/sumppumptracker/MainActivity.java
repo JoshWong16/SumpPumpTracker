@@ -60,9 +60,10 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     //int ydimension = 1080;
     int xdimension, ydimension, xResolution, yResolution;
     int xdelta,ydelta;
-    boolean timerIsOn = false;
-    int counter;
-    Timer timer;
+    boolean timerIsOnP1 = false;
+    boolean timerIsOnP2 = false;
+    int counterP1, counterP2;
+    Timer timerP1, timerP2;
 
     private static final String SERVER_IP = "192.168.0.13";
     private static final int SERVER_PORT = 11967;
@@ -377,12 +378,24 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
         //float redPerc, greenPerc, yellowPerc;
 
-        TimerTask timerTask = new TimerTask() {
+        UpdateAsyncTask updateAsyncTask = new UpdateAsyncTask();
+
+
+        TimerTask timerTaskP1 = new TimerTask() {
 
             @Override
             public void run() {
-                Log.d("mainactivity","seconds passed " + counter);
-                counter++;
+                //Log.d("mainactivity","seconds passed " + counterP1);
+                counterP1++;
+            }
+        };
+
+        TimerTask timerTaskP2 = new TimerTask() {
+
+            @Override
+            public void run() {
+                //Log.d("mainactivity","seconds passed " + counterP1);
+                counterP2++;
             }
         };
 
@@ -390,30 +403,46 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         //scHigh = new Scalar(iHighH, iHighS, iHighV);
 
         Imgproc.cvtColor(inputFrame.rgba(), imgHSV, Imgproc.COLOR_BGR2HSV);//process image and convert it to hsv
-        /*
-        Core.inRange(imgHSV, new Scalar(colorRange[1][0], colorRange[1][1], colorRange[1][2]), new Scalar(colorRange[1][3], colorRange[1][4], colorRange[1][5]), imgThreshold);
-        redPerc = getPercBW((boxRed.getLeft()-60), boxRed.getTop());
 
-        if(!timerIsOn && redPerc >= 50){
+        //Core.inRange(imgHSV, new Scalar(colorRange[1][0], colorRange[1][1], colorRange[1][2]), new Scalar(colorRange[1][3], colorRange[1][4], colorRange[1][5]), imgThreshold);
+        //redPerc = getPercBW((boxRed.getLeft()-60), boxRed.getTop());
+
+        /*if(!timerIsOnP1 && pump1Perc >= 50){
             //start timer
+            timerP1 = new Timer("Pump1Timer");//create a new timer
+            timerP1.scheduleAtFixedRate(timerTaskP1, 30, 1000);//start timer in 30ms to increment  counter
+            timerIsOnP1 = true;
+            updateAsyncTask.execute("LightStatus3","true");
 
-            timer = new Timer("MyTimer");//create a new timer
-            timer.scheduleAtFixedRate(timerTask, 30, 1000);//start timer in 30ms to increment  counter
-            timerIsOn = true;
-
-        }else if(timerIsOn && redPerc < 50){
+        }else if(timerIsOnP1 && pump1Perc < 50){
             //stop timer
-
-            timer.cancel();
-            counter = 0;
-            timerIsOn = false;
-
+            timerP1.cancel();
+            timerIsOnP1 = false;
+            updateAsyncTask.execute("LightStatus3","false");
+            updateAsyncTask.execute("Pump1Time",String.valueOf(counterP1));
+            counterP1 = 0;
         }
 
-        Core.inRange(imgHSV, new Scalar(colorRange[2][0], colorRange[2][1], colorRange[2][2]), new Scalar(colorRange[2][3], colorRange[2][4], colorRange[2][5]), imgThreshold);
-        yellowPerc = getPercBW((boxYellow.getLeft()-60), boxYellow.getTop());
+        if(!timerIsOnP2 && pump1Perc >= 50){
+            //start timer
+            timerP2 = new Timer("Pump1Timer");//create a new timer
+            timerP2.scheduleAtFixedRate(timerTaskP2, 30, 1000);//start timer in 30ms to increment  counter
+            timerIsOnP2 = true;
+            updateAsyncTask.execute("LightStatus4","true");
 
-         */
+        }else if(timerIsOnP2 && pump1Perc < 50){
+            //stop timer
+            timerP2.cancel();
+            timerIsOnP2 = false;
+            updateAsyncTask.execute("LightStatus4","false");
+            updateAsyncTask.execute("Pump2Time",String.valueOf(counterP2));
+            counterP2 = 0;
+        }*/
+
+        //Core.inRange(imgHSV, new Scalar(colorRange[2][0], colorRange[2][1], colorRange[2][2]), new Scalar(colorRange[2][3], colorRange[2][4], colorRange[2][5]), imgThreshold);
+        //yellowPerc = getPercBW((boxYellow.getLeft()-60), boxYellow.getTop());
+
+
 
         Core.inRange(imgHSV, new Scalar(colorRange[0][0], colorRange[0][1], colorRange[0][2]), new Scalar(colorRange[0][3], colorRange[0][4], colorRange[0][5]), imgThreshold);
         float1Perc = getPercBW((boxFloat1.getLeft()-60), boxFloat1.getTop());
@@ -423,8 +452,32 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         pump1Perc = getPercBW((boxPump1.getLeft()-60), boxPump1.getTop());
         pump2Perc = getPercBW((boxPump2.getLeft()-60), boxPump2.getTop());
 
-        /*if(float4Perc > 50){
-            notificationManager.notify(100, builder.build());
+        if(float4Perc > 50){
+            //notificationManager.notify(100, builder.build());
+            updateAsyncTask.execute("LightStatus1","true");
+        }else{
+            updateAsyncTask.execute("LightStatus1","false");
+        }
+
+        /*if(float3Perc > 50){
+            //notificationManager.notify(100, builder.build());
+            updateAsyncTask.execute("LightStatus2","true");
+        }else{
+            updateAsyncTask.execute("LightStatus2","false");
+        }
+
+        if(float2Perc > 50){
+            //notificationManager.notify(100, builder.build());
+            updateAsyncTask.execute("LightStatus5","true");
+        }else{
+            updateAsyncTask.execute("LightStatus5","false");
+        }
+
+        if(float1Perc > 50){
+            //notificationManager.notify(100, builder.build());
+            updateAsyncTask.execute("LightStatus6","true");
+        }else{
+            updateAsyncTask.execute("LightStatus6","false");
         }*/
 
 
