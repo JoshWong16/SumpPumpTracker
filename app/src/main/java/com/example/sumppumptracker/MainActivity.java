@@ -62,6 +62,10 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     int xdelta,ydelta;
     boolean timerIsOnP1 = false;
     boolean timerIsOnP2 = false;
+    boolean float4IsOn = false;
+    boolean float3IsOn = false;
+    boolean float2IsOn = false;
+    boolean float1IsOn = false;
     int counterP1, counterP2;
     Timer timerP1, timerP2;
 
@@ -372,14 +376,17 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
 
 
-
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
 
         //float redPerc, greenPerc, yellowPerc;
 
-        UpdateAsyncTask updateAsyncTask = new UpdateAsyncTask();
-
+        UpdateAsyncTask updateAsyncTask1 = new UpdateAsyncTask();
+        UpdateAsyncTask updateAsyncTask2 = new UpdateAsyncTask();
+        UpdateAsyncTask updateAsyncTask3 = new UpdateAsyncTask();
+        UpdateAsyncTask updateAsyncTask4 = new UpdateAsyncTask();
+        UpdateAsyncTask updateAsyncTask5 = new UpdateAsyncTask();
+        UpdateAsyncTask updateAsyncTask6 = new UpdateAsyncTask();
 
         TimerTask timerTaskP1 = new TimerTask() {
 
@@ -407,37 +414,38 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         //Core.inRange(imgHSV, new Scalar(colorRange[1][0], colorRange[1][1], colorRange[1][2]), new Scalar(colorRange[1][3], colorRange[1][4], colorRange[1][5]), imgThreshold);
         //redPerc = getPercBW((boxRed.getLeft()-60), boxRed.getTop());
 
-        /*if(!timerIsOnP1 && pump1Perc >= 50){
+        if(!timerIsOnP1 && pump1Perc >= 50){
             //start timer
-            timerP1 = new Timer("Pump1Timer");//create a new timer
-            timerP1.scheduleAtFixedRate(timerTaskP1, 30, 1000);//start timer in 30ms to increment  counter
+            //timerP1 = new Timer("Pump1Timer");//create a new timer
+            //timerP1.scheduleAtFixedRate(timerTaskP1, 30, 1000);//start timer in 30ms to increment  counter
             timerIsOnP1 = true;
-            updateAsyncTask.execute("LightStatus3","true");
+            updateAsyncTask1.execute("LightStatus3","true");
 
         }else if(timerIsOnP1 && pump1Perc < 50){
             //stop timer
-            timerP1.cancel();
+            //timerP1.cancel();
             timerIsOnP1 = false;
-            updateAsyncTask.execute("LightStatus3","false");
-            updateAsyncTask.execute("Pump1Time",String.valueOf(counterP1));
+            updateAsyncTask1.execute("LightStatus3","false");
+            //updateAsyncTask1.execute("Pump1Time",String.valueOf(counterP1));
             counterP1 = 0;
         }
 
         if(!timerIsOnP2 && pump1Perc >= 50){
             //start timer
-            timerP2 = new Timer("Pump1Timer");//create a new timer
-            timerP2.scheduleAtFixedRate(timerTaskP2, 30, 1000);//start timer in 30ms to increment  counter
+            //timerP2 = new Timer("Pump1Timer");//create a new timer
+            //timerP2.scheduleAtFixedRate(timerTaskP2, 30, 1000);//start timer in 30ms to increment  counter
             timerIsOnP2 = true;
-            updateAsyncTask.execute("LightStatus4","true");
+            updateAsyncTask2.execute("LightStatus4","true");
 
         }else if(timerIsOnP2 && pump1Perc < 50){
             //stop timer
-            timerP2.cancel();
+            //timerP2.cancel();
             timerIsOnP2 = false;
-            updateAsyncTask.execute("LightStatus4","false");
-            updateAsyncTask.execute("Pump2Time",String.valueOf(counterP2));
+            updateAsyncTask2.execute("LightStatus4","false");
+            //updateAsyncTask2.execute("Pump2Time",String.valueOf(counterP2));
             counterP2 = 0;
-        }*/
+        }
+
 
         //Core.inRange(imgHSV, new Scalar(colorRange[2][0], colorRange[2][1], colorRange[2][2]), new Scalar(colorRange[2][3], colorRange[2][4], colorRange[2][5]), imgThreshold);
         //yellowPerc = getPercBW((boxYellow.getLeft()-60), boxYellow.getTop());
@@ -452,33 +460,42 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         pump1Perc = getPercBW((boxPump1.getLeft()-60), boxPump1.getTop());
         pump2Perc = getPercBW((boxPump2.getLeft()-60), boxPump2.getTop());
 
-        if(float4Perc > 50){
+        if(!float4IsOn && float4Perc >= 50){
             //notificationManager.notify(100, builder.build());
-            updateAsyncTask.execute("LightStatus1","true");
-        }else{
-            updateAsyncTask.execute("LightStatus1","false");
+            updateAsyncTask3.execute("LightStatus1","true");
+            float4IsOn = true;
+        }else if (float4IsOn && float4Perc < 50){
+            updateAsyncTask3.execute("LightStatus1","false");
+            float4IsOn = false;
         }
 
-        /*if(float3Perc > 50){
+        if(!float3IsOn && float3Perc >= 50){
             //notificationManager.notify(100, builder.build());
-            updateAsyncTask.execute("LightStatus2","true");
-        }else{
-            updateAsyncTask.execute("LightStatus2","false");
+            updateAsyncTask4.execute("LightStatus2","true");
+            float3IsOn = true;
+        }else if (float3IsOn && float3Perc < 50){
+            updateAsyncTask4.execute("LightStatus2","false");
+            float3IsOn = false;
         }
 
-        if(float2Perc > 50){
+        if(!float2IsOn && float2Perc >= 50){
             //notificationManager.notify(100, builder.build());
-            updateAsyncTask.execute("LightStatus5","true");
-        }else{
-            updateAsyncTask.execute("LightStatus5","false");
+            updateAsyncTask5.execute("LightStatus5","true");
+            float2IsOn = true;
+        }else if (float2IsOn && float2Perc < 50){
+            updateAsyncTask5.execute("LightStatus5","false");
+            float2IsOn = false;
         }
 
-        if(float1Perc > 50){
+        if(!float1IsOn && float1Perc >= 50){
             //notificationManager.notify(100, builder.build());
-            updateAsyncTask.execute("LightStatus6","true");
-        }else{
-            updateAsyncTask.execute("LightStatus6","false");
-        }*/
+            updateAsyncTask6.execute("LightStatus6","true");
+            float1IsOn = true;
+        }else if (float1IsOn && float1Perc < 50){
+            updateAsyncTask6.execute("LightStatus6","false");
+            float1IsOn = false;
+        }
+
 
 
 
