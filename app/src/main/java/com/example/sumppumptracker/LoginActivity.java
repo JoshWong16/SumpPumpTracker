@@ -97,7 +97,7 @@ public class LoginActivity extends AppCompatActivity {
      * Creates intent to start new ShowLightStatus activity
      */
     private void onLoginClicked(String idToken){
-        Log.d(AppSettings.tag, "onRegisterClicked");
+        Log.d(AppSettings.tag, "onLoginClicked");
         Intent intent = new Intent("android.intent.action.MainActivity");
         intent.putExtra("idToken", idToken);
 

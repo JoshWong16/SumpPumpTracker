@@ -9,17 +9,20 @@ import com.amazonaws.mobileconnectors.dynamodbv2.document.Search;
 import com.amazonaws.mobileconnectors.dynamodbv2.document.Table;
 import com.amazonaws.mobileconnectors.dynamodbv2.document.UpdateItemOperationConfig;
 import com.amazonaws.mobileconnectors.dynamodbv2.document.datatype.Document;
+import com.amazonaws.mobileconnectors.dynamodbv2.document.datatype.DynamoDBEntry;
 import com.amazonaws.mobileconnectors.dynamodbv2.document.datatype.DynamoDBList;
 import com.amazonaws.mobileconnectors.dynamodbv2.document.datatype.Primitive;
 import com.amazonaws.mobileconnectors.dynamodbv2.document.datatype.PrimitiveList;
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
+import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.ReturnValue;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -86,13 +89,13 @@ public class DatabaseAccess {
             retrievedDoc.put(lightID, lightStatus);
 
             //creates a document object with the updated result
-            Document updateResult = dbTable.updateItem(retrievedDoc,  new UpdateItemOperationConfig().withReturnValues(ReturnValue.UPDATED_NEW));
+            Document updateResult = dbTable.updateItem(retrievedDoc,new Primitive(sub), new UpdateItemOperationConfig().withReturnValues(ReturnValue.UPDATED_NEW));
 
             try{
-                Log.i(TAG, "updateResult: " + Document.toJson(updateResult));
+                Log.d(AppSettings.tag, "updateResult: " + Document.toJson(updateResult));
             } catch (IOException e) {
                 e.printStackTrace();
-                Log.i(TAG, "updateResult json error: " + e.getLocalizedMessage());
+                Log.i(AppSettings.tag, "updateResult json error: " + e.getLocalizedMessage());
             }
             return true;
         }else{
@@ -148,44 +151,39 @@ public class DatabaseAccess {
 
     /**
      * updates the array of pump times in dynamoDB
-     * @param time it took for pump to empty water
-     * @param numPump number of pump
+     * @param time time it took for pump to empty water
+     * @param numPump number of pump ie "PumpTimes2"
      * @param sub user subject from idToken
      */
-    public boolean updatePumpTime(int time, String numPump, String sub){
+    public boolean updatePumpTime(String time, String numPump, String sub){
 
         Log.d(AppSettings.tag, "Time passed is: " + String.valueOf(time));
         //get the userItem from DynamoDB
         Document retrievedDoc = dbTable.getItem(new Primitive(sub));
         if (retrievedDoc != null){
-            //get the desired list of pump times associated with the user
-            PrimitiveList times = retrievedDoc.get(numPump).asPrimitiveList();
-
-            //get length of Pump time list
-            List<Primitive> timesList = times.getEntries();
-            int timesLength = timesList.size();
-
-            //only add "time" to list if it's not equal to the most recent time
-
-            if(time != times.get(timesLength-1).asInt()){
-                times.add(time);
-                retrievedDoc.put(numPump, times);
-            }
-            else{
-                Log.d(AppSettings.tag, "in UpdatePumpTime, the time value to add was repeated so nothing is updated");
-                return true;
-            }
-
+            //update set
+            Set<String> replacementSet = new HashSet<>();
+            //get the desired set of pump times associated with the user
+            DynamoDBEntry timeSet = retrievedDoc.get(numPump);
+            //convert Set to List
+            List<String> timeList = timeSet.convertToAttributeValue().getSS();
+            //add existing set to replacement set
+            replacementSet.addAll(timeList);
+            //add new value
+            replacementSet.add(time);
+            //edit userItem with new set
+            retrievedDoc.put(numPump, replacementSet);
+            Log.d(AppSettings.tag, String.valueOf(replacementSet));
 
 
             //creates a document object with the updated result and updates result in Dynamo
-            Document updateResult = dbTable.updateItem(retrievedDoc,  new UpdateItemOperationConfig().withReturnValues(ReturnValue.UPDATED_NEW));
+            Document updateResult = dbTable.updateItem(retrievedDoc, new Primitive(sub), new UpdateItemOperationConfig().withReturnValues(ReturnValue.UPDATED_NEW));
 
             try{
-                Log.i(TAG, "updateResult: " + Document.toJson(updateResult));
+                Log.d(AppSettings.tag, "updateResult: " + Document.toJson(updateResult));
             } catch (IOException e) {
                 e.printStackTrace();
-                Log.i(TAG, "updatePumpTime json error: " + e.getLocalizedMessage());
+                Log.i(AppSettings.tag, "updatePumpTime json error: " + e.getLocalizedMessage());
             }
             return true;
         }else{

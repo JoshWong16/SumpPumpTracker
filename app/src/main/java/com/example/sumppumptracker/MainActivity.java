@@ -608,7 +608,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         @Override
         protected void onPostExecute(Boolean isSuccess) {
             super.onPostExecute(isSuccess);
-            Log.d(AppSettings.tag, "In UpdateAsyncTask onPostExecute: " + isSuccess);
+            //Log.d(AppSettings.tag, "In UpdateAsyncTask onPostExecute: " + isSuccess);
 
         }
 
@@ -638,7 +638,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
             try {
                 //retrieve userItem from database and update desired PumpTimes
-                isSuccess = databaseAccess.updatePumpTime(Integer.parseInt(strings[0]), strings[1], subject);
+                isSuccess = databaseAccess.updatePumpTime(strings[0], strings[1], subject);
 
             }catch (Exception e){
                 Log.e(AppSettings.tag, "error updating pump times");
