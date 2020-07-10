@@ -433,14 +433,14 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             counterP1 = 0;
         }
 
-        if(!timerIsOnP2 && pump1Perc >= 50){
+        if(!timerIsOnP2 && pump2Perc >= 50){
             //start timer
-            timerP2 = new Timer("Pump1Timer");//create a new timer
+            timerP2 = new Timer("Pump2Timer");//create a new timer
             timerP2.scheduleAtFixedRate(timerTaskP2, 30, 1000);//start timer in 30ms to increment  counter
             timerIsOnP2 = true;
             updateAsyncTask2.execute("LightStatus4","true");
 
-        }else if(timerIsOnP2 && pump1Perc < 50){
+        }else if(timerIsOnP2 && pump2Perc < 50){
             //stop timer
             timerP2.cancel();
             timerIsOnP2 = false;
