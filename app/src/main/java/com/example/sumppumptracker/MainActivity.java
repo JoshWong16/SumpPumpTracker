@@ -388,7 +388,10 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         UpdateAsyncTask updateAsyncTask5 = new UpdateAsyncTask();
         UpdateAsyncTask updateAsyncTask6 = new UpdateAsyncTask();
 
-        TimerTask timerTaskP1 = new TimerTask() {
+        UpdatePumpAsyncTask updatePump1Task = new UpdatePumpAsyncTask();
+        UpdatePumpAsyncTask updatePump2Task = new UpdatePumpAsyncTask();
+
+       TimerTask timerTaskP1 = new TimerTask() {
 
             @Override
             public void run() {
@@ -416,33 +419,33 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
         if(!timerIsOnP1 && pump1Perc >= 50){
             //start timer
-            //timerP1 = new Timer("Pump1Timer");//create a new timer
-            //timerP1.scheduleAtFixedRate(timerTaskP1, 30, 1000);//start timer in 30ms to increment  counter
+            timerP1 = new Timer("Pump1Timer");//create a new timer
+            timerP1.scheduleAtFixedRate(timerTaskP1, 30, 1000);//start timer in 30ms to increment  counter
             timerIsOnP1 = true;
             updateAsyncTask1.execute("LightStatus3","true");
 
         }else if(timerIsOnP1 && pump1Perc < 50){
             //stop timer
-            //timerP1.cancel();
+            timerP1.cancel();
             timerIsOnP1 = false;
             updateAsyncTask1.execute("LightStatus3","false");
-            //updateAsyncTask1.execute("Pump1Time",String.valueOf(counterP1));
+            updatePump1Task.execute(String.valueOf(counterP1), "PumpTimes1");
             counterP1 = 0;
         }
 
         if(!timerIsOnP2 && pump1Perc >= 50){
             //start timer
-            //timerP2 = new Timer("Pump1Timer");//create a new timer
-            //timerP2.scheduleAtFixedRate(timerTaskP2, 30, 1000);//start timer in 30ms to increment  counter
+            timerP2 = new Timer("Pump1Timer");//create a new timer
+            timerP2.scheduleAtFixedRate(timerTaskP2, 30, 1000);//start timer in 30ms to increment  counter
             timerIsOnP2 = true;
             updateAsyncTask2.execute("LightStatus4","true");
 
         }else if(timerIsOnP2 && pump1Perc < 50){
             //stop timer
-            //timerP2.cancel();
+            timerP2.cancel();
             timerIsOnP2 = false;
             updateAsyncTask2.execute("LightStatus4","false");
-            //updateAsyncTask2.execute("Pump2Time",String.valueOf(counterP2));
+            updatePump2Task.execute(String.valueOf(counterP2), "PumpTimes2");
             counterP2 = 0;
         }
 

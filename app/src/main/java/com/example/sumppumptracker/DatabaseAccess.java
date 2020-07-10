@@ -154,6 +154,7 @@ public class DatabaseAccess {
      */
     public boolean updatePumpTime(int time, String numPump, String sub){
 
+        Log.d(AppSettings.tag, "Time passed is: " + String.valueOf(time));
         //get the userItem from DynamoDB
         Document retrievedDoc = dbTable.getItem(new Primitive(sub));
         if (retrievedDoc != null){
@@ -165,7 +166,8 @@ public class DatabaseAccess {
             int timesLength = timesList.size();
 
             //only add "time" to list if it's not equal to the most recent time
-            if(time == times.get(timesLength-1).asInt()){
+
+            if(time != times.get(timesLength-1).asInt()){
                 times.add(time);
                 retrievedDoc.put(numPump, times);
             }
