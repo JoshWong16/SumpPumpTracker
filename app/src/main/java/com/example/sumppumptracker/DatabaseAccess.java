@@ -9,7 +9,9 @@ import com.amazonaws.mobileconnectors.dynamodbv2.document.Search;
 import com.amazonaws.mobileconnectors.dynamodbv2.document.Table;
 import com.amazonaws.mobileconnectors.dynamodbv2.document.UpdateItemOperationConfig;
 import com.amazonaws.mobileconnectors.dynamodbv2.document.datatype.Document;
+import com.amazonaws.mobileconnectors.dynamodbv2.document.datatype.DynamoDBList;
 import com.amazonaws.mobileconnectors.dynamodbv2.document.datatype.Primitive;
+import com.amazonaws.mobileconnectors.dynamodbv2.document.datatype.PrimitiveList;
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
@@ -19,6 +21,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Purpose of class is to initialize connection to DynamoDB
@@ -83,7 +86,7 @@ public class DatabaseAccess {
             retrievedDoc.put(lightID, lightStatus);
 
             //creates a document object with the updated result
-            Document updateResult = dbTable.updateItem(retrievedDoc, new UpdateItemOperationConfig().withReturnValues(ReturnValue.UPDATED_NEW));
+            Document updateResult = dbTable.updateItem(retrievedDoc,  new UpdateItemOperationConfig().withReturnValues(ReturnValue.UPDATED_NEW));
 
             try{
                 Log.i(TAG, "updateResult: " + Document.toJson(updateResult));
@@ -147,10 +150,45 @@ public class DatabaseAccess {
      * updates the array of pump times in dynamoDB
      * @param time it took for pump to empty water
      * @param numPump number of pump
-     * @param userItem
+     * @param sub user subject from idToken
      */
-    public void updatePumpTime(int time, int numPump, Document userItem){
+    public boolean updatePumpTime(int time, String numPump, String sub){
 
+        //get the userItem from DynamoDB
+        Document retrievedDoc = dbTable.getItem(new Primitive(sub));
+        if (retrievedDoc != null){
+            //get the desired list of pump times associated with the user
+            PrimitiveList times = retrievedDoc.get(numPump).asPrimitiveList();
+
+            //get length of Pump time list
+            List<Primitive> timesList = times.getEntries();
+            int timesLength = timesList.size();
+
+            //only add "time" to list if it's not equal to the most recent time
+            if(time == times.get(timesLength-1).asInt()){
+                times.add(time);
+                retrievedDoc.put(numPump, times);
+            }
+            else{
+                Log.d(AppSettings.tag, "in UpdatePumpTime, the time value to add was repeated so nothing is updated");
+                return true;
+            }
+
+
+
+            //creates a document object with the updated result and updates result in Dynamo
+            Document updateResult = dbTable.updateItem(retrievedDoc,  new UpdateItemOperationConfig().withReturnValues(ReturnValue.UPDATED_NEW));
+
+            try{
+                Log.i(TAG, "updateResult: " + Document.toJson(updateResult));
+            } catch (IOException e) {
+                e.printStackTrace();
+                Log.i(TAG, "updatePumpTime json error: " + e.getLocalizedMessage());
+            }
+            return true;
+        }else{
+            return false;
+        }
     }
 
 }
