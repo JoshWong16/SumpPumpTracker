@@ -572,7 +572,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     }
 
     /**
-     * Async Task to get all light statuses
+     * Async Task to update all light statuses
      */
     private class UpdateAsyncTask extends AsyncTask<String, Void, Boolean> {
         Document userItem;
@@ -596,7 +596,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                 isSuccess = databaseAccess.updateLightStatus(strings[0], strings[1], subject);
 
             }catch (Exception e){
-                Log.e(AppSettings.tag, "error getting light statuses");
+                Log.e(AppSettings.tag, "error updating light statuses");
             }
 
             return isSuccess;
@@ -611,6 +611,49 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
 
     }
+
+    /**
+     * Async Task to update all light statuses
+     * @param: list of strings containing (in order) pump time and pump name
+     */
+    private class UpdatePumpAsyncTask extends AsyncTask<String, Void, Boolean> {
+
+        boolean isSuccess = false;
+
+        @Override
+        protected Boolean doInBackground(String... strings) {
+            Log.d(AppSettings.tag, "In UpdatePumpAsyncTask DoInBackground");
+
+            String idToken = getIntent().getStringExtra("idToken");
+            HashMap<String, String> logins = new HashMap<String, String>();
+            logins.put("cognito-idp.us-west-2.amazonaws.com/us-west-2_kZujWKyqd", idToken);
+
+            //create instance of DatabaseAccess and decode idToken
+            DatabaseAccess databaseAccess = DatabaseAccess.getInstance(MainActivity.this, logins);
+            JWT jwt = new JWT(idToken);
+            String subject = jwt.getSubject();
+
+            try {
+                //retrieve userItem from database and update desired PumpTimes
+                isSuccess = databaseAccess.updatePumpTime(Integer.parseInt(strings[0]), strings[1], subject);
+
+            }catch (Exception e){
+                Log.e(AppSettings.tag, "error updating pump times");
+            }
+
+            return isSuccess;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean isSuccess) {
+            super.onPostExecute(isSuccess);
+            Log.d(AppSettings.tag, "In UpdatePumpAsyncTask onPostExecute: " + isSuccess);
+
+        }
+
+
+    }
+
 
 
 
