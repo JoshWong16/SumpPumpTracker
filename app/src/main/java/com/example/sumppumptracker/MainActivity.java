@@ -43,6 +43,8 @@ import org.opencv.core.CvType;
 import org.opencv.imgproc.Imgproc;
 
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Timer;
@@ -62,8 +64,8 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     int xdelta,ydelta;
     boolean timerIsOnP1 = false;
     boolean timerIsOnP2 = false;
-    boolean float4IsOn = false;
-    boolean float3IsOn = false;
+    boolean HWAIsOn = false;
+    boolean OVRIsOn = false;
     boolean float2IsOn = false;
     boolean float1IsOn = false;
     int counterP1, counterP2;
@@ -75,7 +77,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
     //app ui objects
     JavaCameraView cameraView;
-    ImageView boxRed, boxYellow, boxFloat1, boxFloat2, boxFloat3, boxFloat4, boxPump1, boxPump2;
+    ImageView boxRed, boxYellow, boxStop, boxStart, boxOVR, boxHWA, boxPump1, boxPump2;
     ViewGroup rootLayout;
     TextView floatPerc, pumpPerc;
     Button btnRed, btnGreen, btnYellow, btnHSV;
@@ -134,13 +136,13 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         cameraView.setCvCameraViewListener(MainActivity.this);
 
         rootLayout = (ViewGroup) findViewById(R.id.activity_main);
-        boxRed = (ImageView) findViewById(R.id.boxRed);
-        boxYellow = (ImageView) findViewById(R.id.boxYellow);
+        boxHWA = (ImageView) findViewById(R.id.boxHighWaterAlarm);
+        boxOVR = (ImageView) findViewById(R.id.boxOverride);
 
-        boxFloat1 = (ImageView) findViewById(R.id.boxFloat1);
-        boxFloat2 = (ImageView) findViewById(R.id.boxFloat2);
-        boxFloat3 = (ImageView) findViewById(R.id.boxFloat3);
-        boxFloat4 = (ImageView) findViewById(R.id.boxFloat4);
+        boxStop = (ImageView) findViewById(R.id.boxFloat1);
+        boxStart = (ImageView) findViewById(R.id.boxFloat2);
+        //boxFloat3 = (ImageView) findViewById(R.id.boxFloat3);
+        //boxFloat4 = (ImageView) findViewById(R.id.boxFloat4);
 
         boxPump1 = (ImageView) findViewById(R.id.boxPump1);
         boxPump2 = (ImageView) findViewById(R.id.boxPump2);
@@ -188,19 +190,19 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         layoutParamsP2.leftMargin = 280;
         layoutParamsP2.topMargin = 110;
 
-        boxRed.setLayoutParams(layoutParamsRed);
+/*        boxRed.setLayoutParams(layoutParamsRed);
         boxRed.setOnTouchListener(this);
         boxYellow.setLayoutParams(layoutParamsYellow);
-        boxYellow.setOnTouchListener(this);
+        boxYellow.setOnTouchListener(this);*/
 
-        boxFloat1.setLayoutParams(layoutParamsF1);
-        boxFloat1.setOnTouchListener(this);
-        boxFloat2.setLayoutParams(layoutParamsF2);
-        boxFloat2.setOnTouchListener(this);
-        boxFloat3.setLayoutParams(layoutParamsF3);
-        boxFloat3.setOnTouchListener(this);
-        boxFloat4.setLayoutParams(layoutParamsF4);
-        boxFloat4.setOnTouchListener(this);
+        boxStop.setLayoutParams(layoutParamsF1);
+        boxStop.setOnTouchListener(this);
+        boxStart.setLayoutParams(layoutParamsF2);
+        boxStart.setOnTouchListener(this);
+        boxOVR.setLayoutParams(layoutParamsF3);
+        boxOVR.setOnTouchListener(this);
+        boxHWA.setLayoutParams(layoutParamsF4);
+        boxHWA.setOnTouchListener(this);
 
         boxPump1.setLayoutParams(layoutParamsP1);
         boxPump1.setOnTouchListener(this);
@@ -419,6 +421,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
         if(!timerIsOnP1 && pump1Perc >= 50){
             //start timer
+            //Date currentTime = Calendar.getInstance().getTime();
             timerP1 = new Timer("Pump1Timer");//create a new timer
             timerP1.scheduleAtFixedRate(timerTaskP1, 30, 1000);//start timer in 30ms to increment  counter
             timerIsOnP1 = true;
@@ -435,6 +438,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
         if(!timerIsOnP2 && pump2Perc >= 50){
             //start timer
+            //Date currentTime = Calendar.getInstance().getTime();
             timerP2 = new Timer("Pump2Timer");//create a new timer
             timerP2.scheduleAtFixedRate(timerTaskP2, 30, 1000);//start timer in 30ms to increment  counter
             timerIsOnP2 = true;
@@ -456,29 +460,33 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
 
         Core.inRange(imgHSV, new Scalar(colorRange[0][0], colorRange[0][1], colorRange[0][2]), new Scalar(colorRange[0][3], colorRange[0][4], colorRange[0][5]), imgThreshold);
-        float1Perc = getPercBW((boxFloat1.getLeft()-60), boxFloat1.getTop());
-        float2Perc = getPercBW((boxFloat2.getLeft()-60), boxFloat2.getTop());
-        float3Perc = getPercBW((boxFloat3.getLeft()-60), boxFloat3.getTop());
-        float4Perc = getPercBW((boxFloat4.getLeft()-60), boxFloat4.getTop());
+        float1Perc = getPercBW((boxStop.getLeft()-60), boxStop.getTop());
+        float2Perc = getPercBW((boxStart.getLeft()-60), boxStart.getTop());
         pump1Perc = getPercBW((boxPump1.getLeft()-60), boxPump1.getTop());
         pump2Perc = getPercBW((boxPump2.getLeft()-60), boxPump2.getTop());
 
-        if(!float4IsOn && float4Perc >= 50){
+        Core.inRange(imgHSV, new Scalar(colorRange[2][0], colorRange[2][1], colorRange[2][2]), new Scalar(colorRange[2][3], colorRange[2][4], colorRange[2][5]), imgThreshold);
+        float3Perc = getPercBW((boxOVR.getLeft()-60), boxOVR.getTop());
+
+        Core.inRange(imgHSV, new Scalar(colorRange[1][0], colorRange[1][1], colorRange[1][2]), new Scalar(colorRange[1][3], colorRange[1][4], colorRange[1][5]), imgThreshold);
+        float4Perc = getPercBW((boxHWA.getLeft()-60), boxHWA.getTop());
+
+        if(!HWAIsOn && float4Perc >= 50){
             //notificationManager.notify(100, builder.build());
             updateAsyncTask3.execute("LightStatus1","true");
-            float4IsOn = true;
-        }else if (float4IsOn && float4Perc < 50){
+            HWAIsOn = true;
+        }else if (HWAIsOn && float4Perc < 50){
             updateAsyncTask3.execute("LightStatus1","false");
-            float4IsOn = false;
+            HWAIsOn = false;
         }
 
-        if(!float3IsOn && float3Perc >= 50){
+        if(!OVRIsOn && float3Perc >= 50){
             //notificationManager.notify(100, builder.build());
             updateAsyncTask4.execute("LightStatus2","true");
-            float3IsOn = true;
-        }else if (float3IsOn && float3Perc < 50){
+            OVRIsOn = true;
+        }else if (OVRIsOn && float3Perc < 50){
             updateAsyncTask4.execute("LightStatus2","false");
-            float3IsOn = false;
+            OVRIsOn = false;
         }
 
         if(!float2IsOn && float2Perc >= 50){
@@ -506,13 +514,13 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             @SuppressLint("SetTextI18n")
             @Override
             public void run() {
-                floatPerc.setText("float 1: "+(int)float1Perc+"\nfloat 2: "+(int)float2Perc+"\nfloat 3: "+(int)float3Perc+"\nfloat 4: "+(int)float4Perc);
+                floatPerc.setText("Stop: "+(int)float1Perc+"\nStart: "+(int)float2Perc+"\nOverride: "+(int)float3Perc+"\nHigh Water: "+(int)float4Perc);
                 pumpPerc.setText("pump 1: "+(int)pump1Perc+"\npump 2: "+(int)pump2Perc);
             }
         });
 
 
-        if(colorID != 3) {//green
+        if(colorID != 3) {
             Core.inRange(imgHSV, new Scalar(colorRange[colorID][0], colorRange[colorID][1], colorRange[colorID][2]), new Scalar(colorRange[colorID][3], colorRange[colorID][4], colorRange[colorID][5]), imgThreshold);
 
             /*Imgproc.rectangle(imgThreshold, new Point((boxRed.getLeft() - 60), boxRed.getTop()), new Point((boxRed.getLeft() + 38), (boxRed.getTop() + 99)), new Scalar(255, 0, 255), 1);
@@ -523,11 +531,12 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             return imgThreshold;
 
         }else{//hsv
+            /*
             Imgproc.rectangle(imgHSV, new Point((boxRed.getLeft() - 60), boxRed.getTop()), new Point((boxRed.getLeft() + 38), (boxRed.getTop() + 99)), new Scalar(255, 0, 255), 1);
             Imgproc.rectangle(imgHSV, new Point((boxFloat1.getLeft() - 60), boxFloat1.getTop()), new Point((boxFloat1.getLeft() + 38), (boxFloat1.getTop() + 99)), new Scalar(255, 0, 255), 1);
             Imgproc.rectangle(imgHSV, new Point((boxYellow.getLeft() - 60), boxYellow.getTop()), new Point((boxYellow.getLeft() + 38), (boxYellow.getTop() + 99)), new Scalar(255, 0, 255), 1);
             Imgproc.rectangle(imgHSV, new Point(0, 0), new Point(imgThreshold.width() - 1, imgThreshold.height() - 1), new Scalar(255, 0, 255), 2);//draw border
-
+            */
             return imgHSV;
         }
     }
