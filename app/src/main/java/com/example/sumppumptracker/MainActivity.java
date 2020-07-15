@@ -620,9 +620,8 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             //Log.d(AppSettings.tag, "In UpdateAsyncTask onPostExecute: " + isSuccess);
 
         }
-
-
     }
+
 
     /**
      * Async Task to update all light statuses
@@ -670,9 +669,5 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
 
     }
-
-
-
-
 }
 
