@@ -43,6 +43,8 @@ import org.opencv.core.CvType;
 import org.opencv.imgproc.Imgproc;
 
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Timer;
@@ -429,7 +431,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             timerP1.cancel();
             timerIsOnP1 = false;
             updateAsyncTask1.execute("LightStatus3","false");
-            updatePump1Task.execute(String.valueOf(counterP1), "PumpTimes1");
+            updatePump1Task.execute(String.valueOf(counterP1), "1");
             counterP1 = 0;
         }
 
@@ -445,7 +447,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             timerP2.cancel();
             timerIsOnP2 = false;
             updateAsyncTask2.execute("LightStatus4","false");
-            updatePump2Task.execute(String.valueOf(counterP2), "PumpTimes2");
+            updatePump2Task.execute(String.valueOf(counterP2), "2");
             counterP2 = 0;
         }
 
@@ -617,11 +619,12 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
     /**
      * Async Task to update all light statuses
-     * @param: list of strings containing (in order) pump time and pump name
+     * @param: list of strings containing (in order) pump time, pump number
      */
     private class UpdatePumpAsyncTask extends AsyncTask<String, Void, Boolean> {
 
-        boolean isSuccess = false;
+        boolean isSuccess1 = false;
+        boolean isSuccess2 = false;
 
         @Override
         protected Boolean doInBackground(String... strings) {
@@ -638,13 +641,17 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
             try {
                 //retrieve userItem from database and update desired PumpTimes
-                isSuccess = databaseAccess.updatePumpTime(strings[0], strings[1], subject);
+                isSuccess1 = databaseAccess.updatePumpTime(strings[0], "PumpTimes" + strings[1], subject);
+
+                Date currentTime = Calendar.getInstance().getTime();
+                isSuccess2 = databaseAccess.updatePumpDateTime(currentTime, "DateTimePump" + strings[1], subject);
+
 
             }catch (Exception e){
                 Log.e(AppSettings.tag, "error updating pump times");
             }
 
-            return isSuccess;
+            return isSuccess2;
         }
 
         @Override

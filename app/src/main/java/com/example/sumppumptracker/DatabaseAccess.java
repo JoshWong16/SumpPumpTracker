@@ -21,6 +21,7 @@ import com.amazonaws.services.dynamodbv2.model.ReturnValue;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -187,6 +188,37 @@ public class DatabaseAccess {
             }
             return true;
         }else{
+            return false;
+        }
+    }
+
+    public boolean updatePumpDateTime(Date currentTime, String numPump, String sub){
+        Document retrievedDoc = dbTable.getItem(new Primitive(sub));
+        if(retrievedDoc != null){
+            //update List
+            List<String> replacementList = new ArrayList<String>();
+            //get current list of Dates
+            DynamoDBEntry dynamoDateList = retrievedDoc.get(numPump);
+            //convert DynamoEntry to List
+            List<String> dateList = dynamoDateList.convertToAttributeValue().getSS();
+            //add existing list to new list
+            replacementList.addAll(dateList);
+            //add new value
+            replacementList.add(currentTime.toString());
+            //update dbTable
+            retrievedDoc.put(numPump, (DynamoDBEntry) replacementList);
+
+            Document updateResult = dbTable.updateItem(retrievedDoc, new Primitive(sub), new UpdateItemOperationConfig().withReturnValues(ReturnValue.UPDATED_NEW));
+
+            try{
+                Log.d(AppSettings.tag, "updateResult: " + Document.toJson(updateResult));
+            } catch (IOException e){
+                e.printStackTrace();
+
+            }
+            return true;
+        }
+        else{
             return false;
         }
     }
