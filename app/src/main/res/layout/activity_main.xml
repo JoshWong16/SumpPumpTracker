@@ -23,7 +23,7 @@
         android:layout_marginBottom="20dp"
         android:rotation="-90"
         android:lines="4"
-        android:text="float 1: 0\nfloat 2: 0\nfloat 3: 0\nfloat 4: 0"
+        android:text="High Water: 0\nfloat 2: 0\nfloat 3: 0\nfloat 4: 0"
         android:textColor="#8BC34A"
         android:textSize="20sp" />
 
@@ -50,8 +50,8 @@
         android:rotation="-90"
         android:layout_margin="1dp"
         android:gravity="center"
-        android:text="float 1"
-        android:textColor="@android:color/holo_red_light" />
+        android:text="Stop"
+        android:textColor="@android:color/white" />
 
     <TextView
         android:id="@+id/txtFloat2"
@@ -64,36 +64,36 @@
         android:rotation="-90"
         android:layout_margin="1dp"
         android:gravity="center"
-        android:text="float 2"
-        android:textColor="@android:color/holo_red_light" />
+        android:text="Start"
+        android:textColor="@android:color/white" />
 
     <TextView
         android:id="@+id/txtFloat3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/boxFloat3"
-        android:layout_alignTop="@+id/boxFloat3"
-        android:layout_alignRight="@+id/boxFloat3"
-        android:layout_alignBottom="@+id/boxFloat3"
+        android:layout_alignLeft="@+id/boxOverride"
+        android:layout_alignTop="@+id/boxOverride"
+        android:layout_alignRight="@+id/boxOverride"
+        android:layout_alignBottom="@+id/boxOverride"
         android:rotation="-90"
         android:layout_margin="1dp"
         android:gravity="center"
-        android:text="float 3"
-        android:textColor="@android:color/holo_red_light" />
+        android:text="Over- ride"
+        android:textColor="@android:color/white" />
 
     <TextView
         android:id="@+id/txtFloat4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/boxFloat4"
-        android:layout_alignTop="@+id/boxFloat4"
-        android:layout_alignRight="@+id/boxFloat4"
-        android:layout_alignBottom="@+id/boxFloat4"
+        android:layout_alignLeft="@+id/boxHighWaterAlarm"
+        android:layout_alignTop="@+id/boxHighWaterAlarm"
+        android:layout_alignRight="@+id/boxHighWaterAlarm"
+        android:layout_alignBottom="@+id/boxHighWaterAlarm"
         android:rotation="-90"
         android:layout_margin="1dp"
         android:gravity="center"
-        android:text="float 4"
-        android:textColor="@android:color/holo_red_light" />
+        android:text="High Water"
+        android:textColor="@android:color/white" />
 
     <TextView
         android:id="@+id/txtPump1"
@@ -124,7 +124,7 @@
         android:textColor="@android:color/holo_red_light" />
 
     <ImageView
-        android:id="@+id/boxRed"
+        android:id="@+id/boxHighWaterAlarm"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_alignParentTop="true"
@@ -134,7 +134,7 @@
         app:srcCompat="@android:color/holo_red_light" />
 
     <ImageView
-        android:id="@+id/boxYellow"
+        android:id="@+id/boxOverride"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_alignParentTop="true"
@@ -155,26 +155,6 @@
 
     <ImageView
         android:id="@+id/boxFloat2"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="180dp"
-        android:alpha="0.5"
-        app:srcCompat="@android:color/holo_green_light" />
-
-    <ImageView
-        android:id="@+id/boxFloat3"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="180dp"
-        android:alpha="0.5"
-        app:srcCompat="@android:color/holo_green_light" />
-
-    <ImageView
-        android:id="@+id/boxFloat4"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_alignParentTop="true"
