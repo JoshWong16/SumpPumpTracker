@@ -45,7 +45,8 @@ public class VerifyActivity extends AppCompatActivity {
                 public void onSuccess() {
                     //User was successfully confirmed
                     result[0] = "Success!";
-                    onVerifyClicked();
+
+                    onVerifyClicked(getIntent().getStringExtra("username"), getIntent().getStringExtra("phone"));
                 }
 
                 @Override
@@ -75,9 +76,11 @@ public class VerifyActivity extends AppCompatActivity {
     /**
      * Creates intent to start new Login activity
      */
-    private void onVerifyClicked(){
+    private void onVerifyClicked(String username, String phone){
         Log.d(AppSettings.tag, "onRegisterClicked");
-        Intent intent = new Intent("android.intent.action.LoginActivity");
+        Intent intent = new Intent("android.intent.action.FirstLoginActivity");
+        intent.putExtra("username", username);
+        intent.putExtra("phone", phone);
         startActivity(intent);
     }
 

@@ -1,5 +1,6 @@
 package com.example.sumppumptracker;
 
+import android.content.ClipData;
 import android.content.Context;
 import android.util.Log;
 
@@ -17,10 +18,13 @@ import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
+import com.amazonaws.services.dynamodbv2.model.ItemCollectionMetrics;
 import com.amazonaws.services.dynamodbv2.model.ReturnValue;
+import com.auth0.android.jwt.JWT;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -164,14 +168,18 @@ public class DatabaseAccess {
         if (retrievedDoc != null){
             //update set
             Set<String> replacementSet = new HashSet<>();
+
             //get the desired set of pump times associated with the user
             DynamoDBEntry timeSet = retrievedDoc.get(numPump);
             //convert Set to List
             List<String> timeList = timeSet.convertToAttributeValue().getSS();
             //add existing set to replacement set
             replacementSet.addAll(timeList);
+
             //add new value
-            replacementSet.add(time);
+            Date currentTime = Calendar.getInstance().getTime();
+            String newVal = currentTime.toString() + "," + time;
+            replacementSet.add(newVal);
             //edit userItem with new set
             retrievedDoc.put(numPump, replacementSet);
             Log.d(AppSettings.tag, String.valueOf(replacementSet));
@@ -221,6 +229,31 @@ public class DatabaseAccess {
         else{
             return false;
         }
+    }
+
+    public void createUser(String idToken, String username, String phone){
+        JWT jwt = new JWT(idToken);
+        String subject = jwt.getSubject();
+
+        Document user = new Document();
+        user.put("UserId", subject);
+        user.put("phone", "1" + phone);
+        user.put("username", username);
+        user.put("LightStatus1", false);
+        user.put("LightStatus2", false);
+        user.put("LightStatus3", false);
+        user.put("LightStatus4", false);
+        user.put("LightStatus5", false);
+        user.put("LightStatus6", false);
+        Set<String> pumpTimes1 = new HashSet<>();
+        pumpTimes1.add("0");
+        Set<String> pumpTimes2 = new HashSet<>();
+        pumpTimes2.add("0");
+        user.put("PumpTimes1", pumpTimes1);
+        user.put("PumpTimes2", pumpTimes2);
+
+        dbTable.putItem(user);
+
     }
 
 }

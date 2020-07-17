@@ -25,6 +25,13 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        <activity android:name=".FirstLoginActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.FirstLoginActivity" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
         <activity android:name=".VerifyActivity">
             <intent-filter>
                 <action android:name="android.intent.action.VerifyActivity" />

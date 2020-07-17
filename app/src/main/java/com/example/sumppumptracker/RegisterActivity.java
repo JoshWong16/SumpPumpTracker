@@ -1,6 +1,7 @@
 package com.example.sumppumptracker;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -13,6 +14,8 @@ import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserCodeDel
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.SignUpHandler;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import java.util.HashMap;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -43,7 +46,7 @@ public class RegisterActivity extends AppCompatActivity {
                 //check if this user (cognitoUser) needs to be confirmed
                 if (!signUpConfirmationState){
                     Log.d(AppSettings.tag, "sign up success...not confirmed, verification code sent to: " + cognitoUserCodeDeliveryDetails.getDestination());
-                    onRegisterClicked();
+                    onRegisterClicked(String.valueOf(inputUsername.getText()), String.valueOf(inputPhone.getText()));
                 }
                 else{
                     //user already confirmed
@@ -64,7 +67,7 @@ public class RegisterActivity extends AppCompatActivity {
                 //add user attributes
                 userAttributes.addAttribute("given_name", String.valueOf(inputName.getText()));
                 userAttributes.addAttribute("email", String.valueOf(inputEmail.getText()));
-                userAttributes.addAttribute("phone_number", String.valueOf(inputPhone.getText()));
+                userAttributes.addAttribute("phone_number", "+1" + String.valueOf(inputPhone.getText()));
 
                 //access custom cognitoSettings class and call getUserPool() to sign up user
                 CognitoSettings cognitoSettings = new CognitoSettings(RegisterActivity.this);
@@ -86,9 +89,11 @@ public class RegisterActivity extends AppCompatActivity {
     /**
      * Creates intent to start new verification activity
      */
-    private void onRegisterClicked(){
+    private void onRegisterClicked(String username, String phone){
         Log.d(AppSettings.tag, "onRegisterClicked");
         Intent intent = new Intent("android.intent.action.VerifyActivity");
+        intent.putExtra("username", username);
+        intent.putExtra("phone", phone);
         startActivity(intent);
     }
 
@@ -100,4 +105,7 @@ public class RegisterActivity extends AppCompatActivity {
         Intent intent = new Intent("android.intent.action.LoginActivity");
         startActivity(intent);
     }
+
+
+
 }

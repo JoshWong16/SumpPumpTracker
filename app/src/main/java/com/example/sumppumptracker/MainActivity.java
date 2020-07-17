@@ -431,7 +431,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             timerP1.cancel();
             timerIsOnP1 = false;
             updateAsyncTask1.execute("LightStatus3","false");
-            updatePump1Task.execute(String.valueOf(counterP1), "1");
+            updatePump1Task.execute(String.valueOf(counterP1), "PumpTimes1");
             counterP1 = 0;
         }
 
@@ -447,7 +447,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             timerP2.cancel();
             timerIsOnP2 = false;
             updateAsyncTask2.execute("LightStatus4","false");
-            updatePump2Task.execute(String.valueOf(counterP2), "2");
+            updatePump2Task.execute(String.valueOf(counterP2), "PumpTimes2");
             counterP2 = 0;
         }
 
@@ -641,14 +641,15 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
             try {
                 //retrieve userItem from database and update desired PumpTimes
-                isSuccess1 = databaseAccess.updatePumpTime(strings[0], "PumpTimes" + strings[1], subject);
+                isSuccess1 = databaseAccess.updatePumpTime(strings[0], strings[1], subject);
 
-                Date currentTime = Calendar.getInstance().getTime();
-                isSuccess2 = databaseAccess.updatePumpDateTime(currentTime, "DateTimePump" + strings[1], subject);
+//                Date currentTime = Calendar.getInstance().getTime();
+//                isSuccess2 = databaseAccess.updatePumpDateTime(currentTime, "DateTimePump" + strings[1], subject);
 
 
             }catch (Exception e){
                 Log.e(AppSettings.tag, "error updating pump times");
+                Log.e(AppSettings.tag, e.getMessage());
             }
 
             return isSuccess2;
