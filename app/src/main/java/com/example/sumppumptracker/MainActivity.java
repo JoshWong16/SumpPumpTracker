@@ -591,17 +591,17 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         boolean isSuccess = false;
         @Override
         protected Boolean doInBackground(String... strings) {
-            Log.d(AppSettings.tag, "In UpdateAsyncTask DoInBackground");
+//            Log.d(AppSettings.tag, "In UpdateAsyncTask DoInBackground");
 
             String idToken = getIntent().getStringExtra("idToken");
             HashMap<String, String> logins = new HashMap<String, String>();
-            logins.put("cognito-idp.us-west-2.amazonaws.com/us-west-2_kZujWKyqd", idToken);
+            logins.put(AppSettings.cognitoPoolURL, idToken); //App Settings is privatized class with aws credentials
 
             //create instance of DatabaseAccess and decode idToken
             DatabaseAccess databaseAccess = DatabaseAccess.getInstance(MainActivity.this, logins);
             JWT jwt = new JWT(idToken);
             String subject = jwt.getSubject();
-
+            Log.d(AppSettings.tag, subject);
             try {
                 //retrieve userItem from database and update desired lightStatuses
 //                userItem = databaseAccess.getUserItem(subject);
@@ -617,7 +617,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         @Override
         protected void onPostExecute(Boolean isSuccess) {
             super.onPostExecute(isSuccess);
-            //Log.d(AppSettings.tag, "In UpdateAsyncTask onPostExecute: " + isSuccess);
+            Log.d(AppSettings.tag, "In UpdateAsyncTask onPostExecute: " + isSuccess);
 
         }
     }
@@ -638,7 +638,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
             String idToken = getIntent().getStringExtra("idToken");
             HashMap<String, String> logins = new HashMap<String, String>();
-            logins.put("cognito-idp.us-west-2.amazonaws.com/us-west-2_kZujWKyqd", idToken);
+            logins.put(AppSettings.cognitoPoolURL, idToken);
 
             //create instance of DatabaseAccess and decode idToken
             DatabaseAccess databaseAccess = DatabaseAccess.getInstance(MainActivity.this, logins);
@@ -658,7 +658,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                 Log.e(AppSettings.tag, e.getMessage());
             }
 
-            return isSuccess2;
+            return isSuccess1;
         }
 
         @Override

@@ -111,7 +111,7 @@ public class FirstLoginActivity extends AppCompatActivity {
             Log.d(AppSettings.tag, "In CreateUserAsynctask DoInBackground");
 
             HashMap<String, String> logins = new HashMap<>();
-            logins.put("cognito-idp.us-west-2.amazonaws.com/us-west-2_kZujWKyqd", strings[0]);
+            logins.put(AppSettings.cognitoPoolURL, strings[0]);
 
             //create instance of DatabaseAccess and decode idToken
             DatabaseAccess databaseAccess = DatabaseAccess.getInstance(FirstLoginActivity.this, logins);

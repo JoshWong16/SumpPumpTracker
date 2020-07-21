@@ -39,9 +39,7 @@ public class DatabaseAccess {
 
     private String TAG = "SumpPumpDB";
 
-    private final String COGNITO_IDENTITY_POOL_ID = "us-west-2:8f70a2b5-fb95-452b-8240-4cfe1ce3974a";
     private final Regions COGNITO_ITENTITY_POOL_REGION = Regions.US_WEST_2;
-    private final String DYNAMODB_TABLE = "SumpPumpUsers";
     private Context context;
     private CognitoCachingCredentialsProvider credentialsProvider;
     private AmazonDynamoDBClient dbClient;
@@ -56,14 +54,14 @@ public class DatabaseAccess {
         this.context = context;
 
         //Create a new credentials provider
-        credentialsProvider =  new CognitoCachingCredentialsProvider(context, COGNITO_IDENTITY_POOL_ID, COGNITO_ITENTITY_POOL_REGION);
+        credentialsProvider =  new CognitoCachingCredentialsProvider(context, AppSettings.COGNITO_IDENTITY_POOL_ID, COGNITO_ITENTITY_POOL_REGION);
         credentialsProvider.setLogins(logins);
         //Create a connection to the DynamoDB service
         dbClient = new AmazonDynamoDBClient(credentialsProvider);
         //Must set dbClient region here or else it defaults to us_east_1
         dbClient.setRegion(Region.getRegion(Regions.US_WEST_2));
         //Create a table reference
-        dbTable = Table.loadTable(dbClient, DYNAMODB_TABLE);
+        dbTable = Table.loadTable(dbClient, AppSettings.DYNAMODB_TABLE_NAME);
     }
 
     /**
@@ -100,7 +98,7 @@ public class DatabaseAccess {
                 Log.d(AppSettings.tag, "updateResult: " + Document.toJson(updateResult));
             } catch (IOException e) {
                 e.printStackTrace();
-                Log.i(AppSettings.tag, "updateResult json error: " + e.getLocalizedMessage());
+                Log.d(AppSettings.tag, "updateResult json error: " + e.getLocalizedMessage());
             }
             return true;
         }else{
@@ -156,6 +154,7 @@ public class DatabaseAccess {
 
     /**
      * updates the array of pump times in dynamoDB
+     * also adds the date and time of when pumps turn on
      * @param time time it took for pump to empty water
      * @param numPump number of pump ie "PumpTimes2"
      * @param sub user subject from idToken
@@ -200,41 +199,20 @@ public class DatabaseAccess {
         }
     }
 
-    public boolean updatePumpDateTime(Date currentTime, String numPump, String sub){
-        Document retrievedDoc = dbTable.getItem(new Primitive(sub));
-        if(retrievedDoc != null){
-            //update List
-            List<String> replacementList = new ArrayList<String>();
-            //get current list of Dates
-            DynamoDBEntry dynamoDateList = retrievedDoc.get(numPump);
-            //convert DynamoEntry to List
-            List<String> dateList = dynamoDateList.convertToAttributeValue().getSS();
-            //add existing list to new list
-            replacementList.addAll(dateList);
-            //add new value
-            replacementList.add(currentTime.toString());
-            //update dbTable
-            retrievedDoc.put(numPump, (DynamoDBEntry) replacementList);
 
-            Document updateResult = dbTable.updateItem(retrievedDoc, new Primitive(sub), new UpdateItemOperationConfig().withReturnValues(ReturnValue.UPDATED_NEW));
-
-            try{
-                Log.d(AppSettings.tag, "updateResult: " + Document.toJson(updateResult));
-            } catch (IOException e){
-                e.printStackTrace();
-
-            }
-            return true;
-        }
-        else{
-            return false;
-        }
-    }
-
+    /**
+     * createUser: when new user registers, this function creates a new row item in dynamodb for new user
+     * @param idToken user's idToken
+     * @param username
+     * @param phone user's phone number
+     */
     public void createUser(String idToken, String username, String phone){
+        //get user subject from idToken
         JWT jwt = new JWT(idToken);
         String subject = jwt.getSubject();
 
+        //create new user document object
+        //add attributes
         Document user = new Document();
         user.put("UserId", subject);
         user.put("phone", "1" + phone);
@@ -252,6 +230,7 @@ public class DatabaseAccess {
         user.put("PumpTimes1", pumpTimes1);
         user.put("PumpTimes2", pumpTimes2);
 
+        //add new user item to dynamoDB table
         dbTable.putItem(user);
 
     }
