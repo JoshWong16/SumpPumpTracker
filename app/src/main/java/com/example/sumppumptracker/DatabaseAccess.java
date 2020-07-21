@@ -217,12 +217,12 @@ public class DatabaseAccess {
         user.put("UserId", subject);
         user.put("phone", "1" + phone);
         user.put("username", username);
-        user.put("LightStatus1", false);
-        user.put("LightStatus2", false);
-        user.put("LightStatus3", false);
-        user.put("LightStatus4", false);
-        user.put("LightStatus5", false);
-        user.put("LightStatus6", false);
+        user.put("LightStatus1", "false");
+        user.put("LightStatus2", "false");
+        user.put("LightStatus3", "false");
+        user.put("LightStatus4", "false");
+        user.put("LightStatus5", "false");
+        user.put("LightStatus6", "false");
         Set<String> pumpTimes1 = new HashSet<>();
         pumpTimes1.add("0");
         Set<String> pumpTimes2 = new HashSet<>();
